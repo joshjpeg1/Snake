@@ -16,6 +16,5 @@ public class TurnSpace extends ASpace {
       throw new IllegalArgumentException("Invalid direction.");
     }
     this.direction = dir;
-    this.fillColor = color(0, 0);
   }
 }

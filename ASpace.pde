@@ -4,7 +4,6 @@
 public abstract class ASpace {
   protected int x;
   protected int y;
-  protected color fillColor;
   
   /**
    * Constructs an {@code ASpace}.
@@ -15,7 +14,6 @@ public abstract class ASpace {
   public ASpace(int x, int y) {
     this.x = x;
     this.y = y;
-    fillColor = color(127);
   }
   
   @Override
@@ -48,11 +46,20 @@ public abstract class ASpace {
   }
   
   /**
+   * Returns the color of this {@code ASpace}.
+   *
+   * @return the space color
+   */
+  public color getColor() {
+    return color(127);
+  }
+  
+  /**
    * Draws the space on the grid.
    */
   public void drawSpace() {
     noStroke();
-    fill(fillColor);
+    fill(getColor());
     rect(this.x * spaceSize, this.y * spaceSize,
          spaceSize, spaceSize);
   }

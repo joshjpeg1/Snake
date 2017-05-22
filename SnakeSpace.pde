@@ -2,9 +2,6 @@
  * Represents a snake's space on the grid.
  */
 public class SnakeSpace extends ASpace {
-  private final color headColor = color(#9de83d);
-  private final color bodyColor = color(#7abc1d);
-  
   private boolean head;
   private Direction direction;
   
@@ -18,7 +15,6 @@ public class SnakeSpace extends ASpace {
     super(x, y);
     this.head = false;
     this.direction = Direction.STILL;
-    this.fillColor = bodyColor;
   }
   
   /**
@@ -36,7 +32,20 @@ public class SnakeSpace extends ASpace {
     }
     this.head = false;
     this.direction = dir;
-    this.fillColor = bodyColor;
+  }
+  
+  /**
+   * Returns the color of this {@code SnakeSpace}.
+   *
+   * @return the space color
+   */
+  @Override
+  public color getColor() {
+    if (head) {
+      return color(#9de83d);
+    } else {
+      return color(#7abc1d);
+    }
   }
   
   /**
@@ -46,10 +55,8 @@ public class SnakeSpace extends ASpace {
   public void setHead(boolean isHead) {
     if (isHead) {
       this.head = true;
-      this.fillColor = headColor;
     } else {
       this.head = false;
-      this.fillColor = bodyColor;
     }
   }
   
