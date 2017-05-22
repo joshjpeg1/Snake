@@ -16,6 +16,9 @@ public ArrayList<TurnSpace> turns;
 
 public boolean snakeAte;
 public boolean gameOver;
+public int highScore;
+public int maxScore;
+public int levelIncrease;
 
 /**
  * Sets up the program.
@@ -24,6 +27,9 @@ void setup() {
   size(1000, 1000);
   frameRate(15);
   spaceSize = width / BOARD;
+  highScore = 0;
+  levelIncrease = 10;
+  maxScore = levelIncrease;
   init();
 }
 
@@ -61,13 +67,39 @@ void endScreen() {
   fill(255);
   textAlign(CENTER);
   textSize(100);
-  text("game over :(", width/2, height/2);
+  if (winCondition()) {
+    text("you win!", width/2, height/2);
+  } else {
+    text("game over :(", width/2, height/2);
+  }
+  int padding = 0;
+  fill(#5ddaff);
+  textSize(20);
+  padding = 40;
+  if (snake.size() > highScore) {
+    text("NEW HIGH SCORE: " + snake.size(), width/2, height/2 + padding);
+  } else {
+    text("HIGH SCORE: " + highScore, width/2, height/2 + padding);
+  }
+  fill(255);
+  textSize(20);
+  padding += 30;
+  text("score: " + snake.size(), width/2, height/2 + padding);
+  textSize(20);
+  padding += 30;
+  text("press R to restart", width/2, height/2 + padding);
 }
 
 /**
  * Helper to the draw() function. Updates and draws the current game state.
  */
 void update() {
+  fill(255);
+  textAlign(CENTER);
+  textSize(100);
+  if (snake.get(0).direction == Direction.STILL) {
+    text("LEVEL " + maxScore/levelIncrease, width/2, height/2);
+  }
   ArrayList<TurnSpace> removeTurns = new ArrayList<TurnSpace>();
   food.drawSpace();
   for (SnakeSpace s : snake) {
@@ -128,10 +160,22 @@ void keyPressed() {
         break;
     }
   } else if (gameOver && (key == 'r' || key == 'R')) {
+    if (snake.size() > highScore) {
+      highScore = snake.size();
+    }
+    if (winCondition()) {
+      maxScore += levelIncrease;
+    }
     init();
   }
 }
 
+/**
+ * Adds a new turn to the turns list, if not the same direction of the snake head
+ * or position of the last turn.
+ *
+ * @throws IllegalArgumentException if the given {@code TurnSpace} is null
+ */
 void addNewTurn(TurnSpace t) {
   if (t == null) {
     throw new IllegalArgumentException("Can't add null.");
@@ -158,5 +202,14 @@ boolean isGameOver() {
       return true;
     }
   }
-  return snake.get(0).outOfBounds(BOARD - 1, BOARD - 1);
+  return snake.get(0).outOfBounds(BOARD - 1, BOARD - 1) || winCondition();
+}
+
+/**
+ * Decides whether the player has beat the level.
+ *
+ * @return true if the player won, false otherwise
+ */
+boolean winCondition() {
+  return snake.size() == maxScore;
 }
