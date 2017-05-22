@@ -1,5 +1,10 @@
 /**
  * The main tab for the snake game.
+ *
+ * @author       Joshua Pensky
+ * @title        Snake
+ * @description  A game where users play as a snake, maneuvering around the map and themselves to get food and become larger.
+ * @version      1.0.2
  */
  
 public static final int BOARD = 50;
@@ -17,7 +22,7 @@ public boolean gameOver;
  */
 void setup() {
   size(1000, 1000);
-  frameRate(10);
+  frameRate(15);
   spaceSize = width / BOARD;
   init();
 }
@@ -27,7 +32,9 @@ void setup() {
  */
 void init() {
   snake = new ArrayList<SnakeSpace>();
-  snake.add(new SnakeSpace(1, 1));
+  SnakeSpace head = new SnakeSpace(1, 1);
+  head.setHead(true);
+  snake.add(head);
   food = new FoodSpace(BOARD, BOARD);
   turns = new ArrayList<TurnSpace>();
   snakeAte = false;
@@ -38,7 +45,7 @@ void init() {
  * Draws the current state of the game.
  */
 void draw() {
-  background(0);
+  background(color(#2d0e05));
   gameOver = isGameOver();
   if (gameOver) {
     endScreen();
@@ -61,13 +68,13 @@ void endScreen() {
  * Helper to the draw() function. Updates and draws the current game state.
  */
 void update() {
-  ArrayList<TurnSpace> toRemove = new ArrayList<TurnSpace>();
+  ArrayList<TurnSpace> removeTurns = new ArrayList<TurnSpace>();
   food.drawSpace();
   for (SnakeSpace s : snake) {
     s.drawSpace();
     for (TurnSpace t : turns) {
       if (s.turn(t) && snake.indexOf(s) == snake.size() - 1) {
-        toRemove.add(t);
+        removeTurns.add(t);
       }
     }
     if (s.samePosition(food)) {
@@ -78,14 +85,23 @@ void update() {
       s.move();
     }
   }
-  for (TurnSpace t : toRemove) {
+  for (TurnSpace t : removeTurns) {
     turns.remove(t);
   }
   if (snakeAte) {
-    snake.add(0, new SnakeSpace(snake.get(0).x, snake.get(0).y, snake.get(0).direction));
-    snake.get(0).move();
+    for (SnakeSpace s : snake) {
+      s.setHead(false);
+    }
+    SnakeSpace head = new SnakeSpace(snake.get(0).x, snake.get(0).y, snake.get(0).direction);
+    head.setHead(true);
+    head.move();
+    snake.add(0, head);
     snakeAte = false;
   }
+  textAlign(RIGHT);
+  fill(255);
+  textSize(20);
+  text("Length: " + snake.size(), width - 20, 40);
 }
 
 /**
@@ -97,22 +113,37 @@ void keyPressed() {
   if (key == CODED) {
     switch (keyCode) {
       case UP:
-        turns.add(new TurnSpace(head.x, head.y, Direction.DIR_UP));
+        addNewTurn(new TurnSpace(head.x, head.y, Direction.DIR_UP));
         break;
       case DOWN:
-        turns.add(new TurnSpace(head.x, head.y, Direction.DIR_DOWN));
+        addNewTurn(new TurnSpace(head.x, head.y, Direction.DIR_DOWN));
         break;
       case LEFT:
-        turns.add(new TurnSpace(head.x, head.y, Direction.DIR_LEFT));
+        addNewTurn(new TurnSpace(head.x, head.y, Direction.DIR_LEFT));
         break;
       case RIGHT:
-        turns.add(new TurnSpace(head.x, head.y, Direction.DIR_RIGHT));
+        addNewTurn(new TurnSpace(head.x, head.y, Direction.DIR_RIGHT));
         break;
       default:
         break;
     }
   } else if (gameOver && (key == 'r' || key == 'R')) {
     init();
+  }
+}
+
+void addNewTurn(TurnSpace t) {
+  if (t == null) {
+    throw new IllegalArgumentException("Can't add null.");
+  }
+  if (!t.direction.equals(snake.get(0).direction)) {
+    if (turns.size() == 0) {
+      turns.add(t);
+    } else {
+      if (!turns.get(turns.size() - 1).samePosition(t)) {
+        turns.add(t);
+      }
+    }
   }
 }
 

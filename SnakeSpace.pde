@@ -2,8 +2,8 @@
  * Represents a snake's space on the grid.
  */
 public class SnakeSpace extends ASpace {
-  private final color bodyColor = color(0, 255, 0);
-  private final color headColor = color(0, 255, 255);
+  private final color headColor = color(#9de83d);
+  private final color bodyColor = color(#7abc1d);
   
   private boolean head;
   private Direction direction;
@@ -31,7 +31,7 @@ public class SnakeSpace extends ASpace {
    */
   public SnakeSpace(int x, int y, Direction dir) throws IllegalArgumentException {
     super(x, y);
-    if (direction == null) {
+    if (dir == null) {
       throw new IllegalArgumentException("Invalid direction.");
     }
     this.head = false;

@@ -11,7 +11,7 @@ public class FoodSpace extends ASpace {
   public FoodSpace(int hiX, int hiY) {
     super(0, 0);
     randomSpace(hiX, hiY);
-    this.fillColor = color(255, 0, 0);
+    this.fillColor = color(#ff92ea);
   }
   
   /**
