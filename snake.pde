@@ -2,38 +2,30 @@
  * The main tab for the snake game.
  */
  
-public int spaceSize;
 public static final int BOARD = 50;
+public int spaceSize;
 
 public ArrayList<SnakeSpace> snake;
 public FoodSpace food;
 public ArrayList<TurnSpace> turns;
+
 public boolean snakeAte;
 public boolean gameOver;
 
-// Setup function
+/**
+ * Sets up the program.
+ */
 void setup() {
   size(1000, 1000);
   frameRate(10);
   spaceSize = width / BOARD;
-  reset();
+  init();
 }
 
-// Draw function
-void draw() {
-  background(0);
-  gameOver = isGameOver();
-  if (gameOver) {
-    fill(255);
-    textAlign(CENTER);
-    textSize(100);
-    text("game over", width/2, height/2);
-  } else {
-    update();
-  }
-}
-
-void reset() {
+/**
+ * Initializes/Resets the world back to its original state.
+ */
+void init() {
   snake = new ArrayList<SnakeSpace>();
   snake.add(new SnakeSpace(1, 1));
   food = new FoodSpace(BOARD, BOARD);
@@ -42,39 +34,32 @@ void reset() {
   gameOver = false;
 }
 
-void keyPressed() {
-  SnakeSpace head = snake.get(0);
-  if (key == CODED) {
-    switch (keyCode) {
-      case UP:
-        turns.add(new TurnSpace(head.x, head.y, Direction.DIR_UP));
-        break;
-      case DOWN:
-        turns.add(new TurnSpace(head.x, head.y, Direction.DIR_DOWN));
-        break;
-      case LEFT:
-        turns.add(new TurnSpace(head.x, head.y, Direction.DIR_LEFT));
-        break;
-      case RIGHT:
-        turns.add(new TurnSpace(head.x, head.y, Direction.DIR_RIGHT));
-        break;
-      default:
-        break;
-    }
-  } else if (gameOver && (key == 'r' || key == 'R')) {
-    reset();
+/**
+ * Draws the current state of the game.
+ */
+void draw() {
+  background(0);
+  gameOver = isGameOver();
+  if (gameOver) {
+    endScreen();
+  } else {
+    update();
   }
 }
 
-boolean isGameOver() {
-  for (int i = 1; i < snake.size(); i++) {
-    if (snake.get(i).equals(snake.get(0))) {
-      return true;
-    }
-  }
-  return snake.get(0).outOfBounds(BOARD - 1, BOARD - 1);
+/**
+ * Helper to the draw() function. Draws the end screen state.
+ */
+void endScreen() {
+  fill(255);
+  textAlign(CENTER);
+  textSize(100);
+  text("game over :(", width/2, height/2);
 }
 
+/**
+ * Helper to the draw() function. Updates and draws the current game state.
+ */
 void update() {
   ArrayList<TurnSpace> toRemove = new ArrayList<TurnSpace>();
   food.drawSpace();
@@ -101,4 +86,46 @@ void update() {
     snake.get(0).move();
     snakeAte = false;
   }
+}
+
+/**
+ * Adds a new turning space if a directional key is pressed, or
+ * resets the world if R is pressed and game is over.
+ */
+void keyPressed() {
+  SnakeSpace head = snake.get(0);
+  if (key == CODED) {
+    switch (keyCode) {
+      case UP:
+        turns.add(new TurnSpace(head.x, head.y, Direction.DIR_UP));
+        break;
+      case DOWN:
+        turns.add(new TurnSpace(head.x, head.y, Direction.DIR_DOWN));
+        break;
+      case LEFT:
+        turns.add(new TurnSpace(head.x, head.y, Direction.DIR_LEFT));
+        break;
+      case RIGHT:
+        turns.add(new TurnSpace(head.x, head.y, Direction.DIR_RIGHT));
+        break;
+      default:
+        break;
+    }
+  } else if (gameOver && (key == 'r' || key == 'R')) {
+    init();
+  }
+}
+
+/**
+ * Decides whether the game is over or not.
+ *
+ * @return true if the game is over, false otherwise
+ */
+boolean isGameOver() {
+  for (int i = 1; i < snake.size(); i++) {
+    if (snake.get(i).equals(snake.get(0))) {
+      return true;
+    }
+  }
+  return snake.get(0).outOfBounds(BOARD - 1, BOARD - 1);
 }

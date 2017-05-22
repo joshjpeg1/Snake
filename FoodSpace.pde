@@ -3,7 +3,10 @@
  */
 public class FoodSpace extends ASpace {
   /**
-   * Constructs an {@code TurnSpace}.
+   * Constructs a {@code FoodSpace}.
+   *
+   * @param hiX   the upper-bound of the x-position
+   * @param hiY   the upper-bound of the y-position
    */
   public FoodSpace(int hiX, int hiY) {
     super(0, 0);
@@ -11,6 +14,12 @@ public class FoodSpace extends ASpace {
     this.fillColor = color(255, 0, 0);
   }
   
+  /**
+   * Assigns this {@code FoodSpace} a random position on the grid.
+   *
+   * @param hiX   the upper-bound of the x-position
+   * @param hiY   the upper-bound of the y-position
+   */
   public void randomSpace(int hiX, int hiY) {
     this.x = int(random(hiX));
     this.y = int(random(hiY));

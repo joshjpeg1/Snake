@@ -4,10 +4,11 @@
 public class TurnSpace extends ASpace {
   protected Direction direction;
   /**
-   * Constructs an {@code TurnSpace}.
-   * @param x            the x-position
-   * @param y            the y-position
-   * @param direction    the direction of the turn
+   * Constructs a {@code TurnSpace}.
+   *
+   * @param x       the x-position
+   * @param y       the y-position
+   * @param dir     the direction of the turn
    */
   public TurnSpace(int x, int y, Direction dir) {
     super(x, y);

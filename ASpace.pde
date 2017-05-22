@@ -8,6 +8,7 @@ public abstract class ASpace {
   
   /**
    * Constructs an {@code ASpace}.
+   * 
    * @param x     the x-position
    * @param y     the y-position
    */
@@ -28,12 +29,21 @@ public abstract class ASpace {
     return this.samePosition((ASpace) that);
   }
   
+  @Override
+  public int hashCode() {
+    return (x * 1000) + y;
+  }
+  
   /**
    * Checks whether this {@code ASpace} is at the same position of the given one.
    *
    * @return true if the same position, false otherwise
+   * @throws IllegalArgumentException if given {@code ASpace} is null
    */
-  public boolean samePosition(ASpace other) {
+  public boolean samePosition(ASpace other) throws IllegalArgumentException {
+    if (other == null) {
+      throw new IllegalArgumentException("Cannot be same position as null.");
+    }
     return this.x == other.x && this.y == other.y;
   }
   

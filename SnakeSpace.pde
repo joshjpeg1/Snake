@@ -2,11 +2,15 @@
  * Represents a snake's space on the grid.
  */
 public class SnakeSpace extends ASpace {
+  private final color bodyColor = color(0, 255, 0);
+  private final color headColor = color(0, 255, 255);
+  
   private boolean head;
   private Direction direction;
   
   /**
    * Constructs a {@code SnakeSpace}.
+   *
    * @param x     the x-position
    * @param y     the y-position
    */
@@ -14,25 +18,39 @@ public class SnakeSpace extends ASpace {
     super(x, y);
     this.head = false;
     this.direction = Direction.STILL;
-    this.fillColor = color(0, 255, 0);
-  }
-  
-  public SnakeSpace(int x, int y, Direction direction) {
-    super(x, y);
-    if (direction == null) {
-      throw new IllegalArgumentException();
-    }
-    this.head = false;
-    this.direction = direction;
-    this.fillColor = color(0, 255, 0);
+    this.fillColor = bodyColor;
   }
   
   /**
-   * Sets the snake space to be the "head" of the snake.
+   * Constructs a {@code SnakeSpace}.
+   *
+   * @param x      the x-position
+   * @param y      the y-position
+   * @param dir    the direction of the snake
+   * @throws IllegalArgumentException if the given {@code Direction} is null
    */
-  public void setHead() {
-    this.head = true;
-    this.fillColor = color(0, 255, 255);
+  public SnakeSpace(int x, int y, Direction dir) throws IllegalArgumentException {
+    super(x, y);
+    if (direction == null) {
+      throw new IllegalArgumentException("Invalid direction.");
+    }
+    this.head = false;
+    this.direction = dir;
+    this.fillColor = bodyColor;
+  }
+  
+  /**
+   * If true, sets the snake space to be the "head" of the snake. Otherwise,
+   * sets the snake space to be the "body."
+   */
+  public void setHead(boolean isHead) {
+    if (isHead) {
+      this.head = true;
+      this.fillColor = headColor;
+    } else {
+      this.head = false;
+      this.fillColor = bodyColor;
+    }
   }
   
   /**
@@ -62,7 +80,14 @@ public class SnakeSpace extends ASpace {
     }
   }
   
-  
+  /**
+   * Turns a snake if the same position of the given {@code TurnSpace} and
+   * is a valid turn.
+   *
+   * @param t      the space that a snake can turn
+   * @return true if the {@code TurnSpace} is at the same position as the snake, false otherwise
+   * @throws IllegalArgumentException if the given {@code TurnSpace} is null
+   */
   public boolean turn(TurnSpace t) throws IllegalArgumentException {
     if (t == null) {
       throw new IllegalArgumentException("Cannot turn that way.");
