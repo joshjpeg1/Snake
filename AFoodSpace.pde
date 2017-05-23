@@ -1,20 +1,20 @@
 /**
  * Represents a food space on the grid.
  */
-public /*abstract*/ class FoodSpace extends ASpace {
+public abstract class AFoodSpace extends ASpace {
   /**
-   * Constructs a {@code FoodSpace}.
+   * Constructs a {@code AFoodSpace}.
    *
    * @param hiX   the upper-bound of the x-position
    * @param hiY   the upper-bound of the y-position
    */
-  public FoodSpace(int hiX, int hiY) {
+  public AFoodSpace(int hiX, int hiY) {
     super(0, 0);
     randomSpace(hiX, hiY);
   }
   
   /**
-   * Assigns this {@code FoodSpace} a random position on the grid.
+   * Assigns this {@code AFoodSpace} a random position on the grid.
    *
    * @param hiX   the upper-bound of the x-position
    * @param hiY   the upper-bound of the y-position
@@ -24,11 +24,6 @@ public /*abstract*/ class FoodSpace extends ASpace {
     this.y = int(random(hiY));
   }
   
-  /**
-   * Returns the color of this {@code FoodSpace}.
-   *
-   * @return the space color
-   */
   @Override
   public color getColor() {
     return color(234);
@@ -36,13 +31,12 @@ public /*abstract*/ class FoodSpace extends ASpace {
     return rainbow[int(random(rainbow.length))];*/
   }
   
-  public void eatEffect(ArrayList<SnakeSpace> snake) {
-    for (SnakeSpace s : snake) {
-      s.setHead(false);
-    }
-    SnakeSpace newHead = new SnakeSpace(snake.get(0).x, snake.get(0).y, snake.get(0).direction);
-    newHead.setHead(true);
-    newHead.move();
-    snake.add(0, newHead);
-  }
+  /**
+   * Mutates the list based on the effect of this {@code AFoodSpace}.
+   *
+   * @param snake       a list of {@code SnakeSpace}s representing a snake
+   * @throws IllegalArgumentException if given snake-list is null or size 0
+   */
+  public abstract void eatEffect(ArrayList<SnakeSpace> snake, ArrayList<AFoodSpace> foods,
+                                 int hiX, int hiY) throws IllegalArgumentException;
 }

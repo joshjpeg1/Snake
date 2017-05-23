@@ -19,7 +19,6 @@ void setup() {
   size(1000, 1000);
   spaceSize = width / BOARD_SIZE;
   model = new SnakeModel();
-  
 }
 
 /**
