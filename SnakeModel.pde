@@ -14,6 +14,8 @@ public class SnakeModel {
   private color ground = color(#2d0e05);
   private color blue = color(#3a7cef);
   private color red = color(#ff3b4a);
+  private color green = color(#0edd48);
+  private color gray = color(#afafaf);
   
   private PFont pixeled = createFont("Pixeled.ttf", 20);
   
@@ -76,7 +78,7 @@ public class SnakeModel {
     textAlign(CENTER);
     textSize(100);
     text("snake", width/2, height/2);
-    fill(blue);
+    fill(green);
     textSize(20);
     text("click to start", width/2, height/2 + 40);
   }
@@ -131,13 +133,15 @@ public class SnakeModel {
       fill(blue);
       text("NEW HIGH SCORE: " + snake.size(), width/2, height/2 + padding);
     } else {
+      fill(gray);
       text("HIGH SCORE: " + highScore, width/2, height/2 + padding);
     }
-    fill(white);
+    fill(gray);
     padding += 40;
     text("score: " + snake.size(), width/2, height/2 + padding);
     padding += 40;
-    text("press C to continue", width/2, height/2 + padding);
+    fill(green);
+    text("continue", width/2, height/2 + padding);
   }
   
   /**
@@ -201,7 +205,7 @@ public class SnakeModel {
    * Helper to the keyHandler() function. Handles keys for the GAME_OVER game state.
    */
   private void keyHandlerGameOver() {
-    if (key == 'c' || key == 'C') {
+    if (key == '\n' || key == '\r') {
       init();
     }
   }
