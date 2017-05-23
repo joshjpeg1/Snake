@@ -6,8 +6,6 @@ public class SnakeModel {
   private ArrayList<AFoodSpace> foods;
   private ArrayList<TurnSpace> turns;
   private GameState gameState;
-  
-  private boolean snakeAte;
   private int highScore;
 
   private final color white = color(255);
@@ -16,7 +14,6 @@ public class SnakeModel {
   private final color red = color(#ff3b4a);
   private final color green = color(#0edd48);
   private final color gray = color(#afafaf);
-  
   private PFont pixeled = createFont("Pixeled.ttf", 20);
   
   /**
@@ -44,7 +41,6 @@ public class SnakeModel {
     foods = new ArrayList<AFoodSpace>();
     foods.add(new DefaultFoodSpace(BOARD_SIZE, BOARD_SIZE));
     turns = new ArrayList<TurnSpace>();
-    snakeAte = false;
   }
   
   /**
@@ -94,9 +90,8 @@ public class SnakeModel {
       f.drawSpace();
     }
     for (AFoodSpace f : foods) {
-      if (!snakeAte && snake.get(0).samePosition(f)) {
+      if (eaten == null && snake.get(0).samePosition(f)) {
         eaten = f;
-        snakeAte = true;
       }
     }
     for (SnakeSpace s : snake) {
@@ -106,18 +101,14 @@ public class SnakeModel {
           removeTurns.add(t);
         }
       }
-      
-      if (!snakeAte) {
-        s.move();
-      }
+      s.move();
+    }
+    if (eaten != null) {
+      eaten.eatEffect(snake, foods, BOARD_SIZE, BOARD_SIZE);
+      foods.remove(eaten);
     }
     for (TurnSpace t : removeTurns) {
       turns.remove(t);
-    }
-    if (snakeAte && eaten != null) {
-      eaten.eatEffect(snake, foods, BOARD_SIZE, BOARD_SIZE);
-      foods.remove(eaten);
-      snakeAte = false;
     }
     textAlign(RIGHT);
     fill(white);
