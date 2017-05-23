@@ -17,8 +17,6 @@ public ArrayList<TurnSpace> turns;
 public boolean snakeAte;
 public boolean gameOver;
 public int highScore;
-public int maxScore;
-public int levelIncrease;
 
 /**
  * Sets up the program.
@@ -28,8 +26,6 @@ void setup() {
   frameRate(15);
   spaceSize = width / BOARD;
   highScore = 0;
-  levelIncrease = 10;
-  maxScore = levelIncrease;
   init();
 }
 
@@ -67,11 +63,7 @@ void endScreen() {
   fill(255);
   textAlign(CENTER);
   textSize(100);
-  if (winCondition()) {
-    text("you win!", width/2, height/2);
-  } else {
-    text("game over :(", width/2, height/2);
-  }
+  text("game over :(", width/2, height/2);
   int padding = 0;
   fill(#5ddaff);
   textSize(20);
@@ -87,7 +79,7 @@ void endScreen() {
   text("score: " + snake.size(), width/2, height/2 + padding);
   textSize(20);
   padding += 30;
-  text("press R to restart", width/2, height/2 + padding);
+  text("press C to continue", width/2, height/2 + padding);
 }
 
 /**
@@ -97,9 +89,6 @@ void update() {
   fill(255);
   textAlign(CENTER);
   textSize(100);
-  if (snake.get(0).direction == Direction.STILL) {
-    text("LEVEL " + maxScore/levelIncrease, width/2, height/2);
-  }
   ArrayList<TurnSpace> removeTurns = new ArrayList<TurnSpace>();
   food.drawSpace();
   for (SnakeSpace s : snake) {
@@ -159,12 +148,9 @@ void keyPressed() {
       default:
         break;
     }
-  } else if (gameOver && (key == 'r' || key == 'R')) {
+  } else if (gameOver && (key == 'c' || key == 'C')) {
     if (snake.size() > highScore) {
       highScore = snake.size();
-    }
-    if (winCondition()) {
-      maxScore += levelIncrease;
     }
     init();
   }
@@ -202,14 +188,5 @@ boolean isGameOver() {
       return true;
     }
   }
-  return snake.get(0).outOfBounds(BOARD - 1, BOARD - 1) || winCondition();
-}
-
-/**
- * Decides whether the player has beat the level.
- *
- * @return true if the player won, false otherwise
- */
-boolean winCondition() {
-  return snake.size() == maxScore;
+  return snake.get(0).outOfBounds(BOARD - 1, BOARD - 1);
 }
