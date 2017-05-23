@@ -10,8 +10,9 @@ public class SnakeModel {
   private boolean snakeAte;
   private int highScore;
 
-  private color blue = color(#5ddaff);;
-  private color ground = color(#2d0e05);;
+  private color blue = color(#5ddaff);
+  private color ground = color(#2d0e05);
+  private color white = color(#ffffff);
   
   /**
    * Constructs a model of the game snake and starts the program.
@@ -67,7 +68,7 @@ public class SnakeModel {
    * Helper to the update() function. Draws the end screen state.
    */
   private void drawGameOver() {
-    fill(255);
+    fill(white);
     textAlign(CENTER);
     textSize(100);
     text("game over :(", width/2, height/2);
@@ -80,7 +81,7 @@ public class SnakeModel {
     } else {
       text("HIGH SCORE: " + highScore, width/2, height/2 + padding);
     }
-    fill(255);
+    fill(white);
     textSize(20);
     padding += 30;
     text("score: " + snake.size(), width/2, height/2 + padding);
@@ -102,10 +103,7 @@ public class SnakeModel {
           removeTurns.add(t);
         }
       }
-      if (s.samePosition(food)) {
-        food = new FoodSpace(BOARD_SIZE, BOARD_SIZE);
-        snakeAte = true;
-      }
+      snakeAte = snakeAte || s.samePosition(food);
       if (!snakeAte) {
         s.move();
       }
@@ -114,17 +112,12 @@ public class SnakeModel {
       turns.remove(t);
     }
     if (snakeAte) {
-      for (SnakeSpace s : snake) {
-        s.setHead(false);
-      }
-      SnakeSpace head = new SnakeSpace(snake.get(0).x, snake.get(0).y, snake.get(0).direction);
-      head.setHead(true);
-      head.move();
-      snake.add(0, head);
+      food.eatEffect(snake);
+      food = new FoodSpace(BOARD_SIZE, BOARD_SIZE);
       snakeAte = false;
     }
     textAlign(RIGHT);
-    fill(255);
+    fill(white);
     if (snake.size() > highScore) {
       fill(blue);
     }

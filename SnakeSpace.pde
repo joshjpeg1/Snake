@@ -34,6 +34,11 @@ public class SnakeSpace extends ASpace {
     this.direction = dir;
   }
   
+  @Override
+  public String toString() {
+    return "(" + x + ", " + y + ", " + direction.toString() + "," + head + ")";
+  }
+  
   /**
    * Returns the color of this {@code SnakeSpace}.
    *

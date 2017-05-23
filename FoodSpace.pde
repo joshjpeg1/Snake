@@ -35,4 +35,14 @@ public /*abstract*/ class FoodSpace extends ASpace {
     /*color[] rainbow = {color(#ff3e3e), color(#ffa83e), color(#f8ff3e), color(#3eff6c), color(#3e89ff), color(#b13eff)};
     return rainbow[int(random(rainbow.length))];*/
   }
+  
+  public void eatEffect(ArrayList<SnakeSpace> snake) {
+    for (SnakeSpace s : snake) {
+      s.setHead(false);
+    }
+    SnakeSpace newHead = new SnakeSpace(snake.get(0).x, snake.get(0).y, snake.get(0).direction);
+    newHead.setHead(true);
+    newHead.move();
+    snake.add(0, newHead);
+  }
 }
