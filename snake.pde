@@ -3,12 +3,17 @@
  *
  * @author       Joshua Pensky
  * @title        Snake
- * @description  A game where users play as a snake, maneuvering around the map and themselves to get food and become larger.
- * @version      1.0.2
+ * @description  A game where users play as a snake, maneuvering around the map and themself
+                 to get food and become larger.
+ * @version      1.0.3
  */
  
-public static final int BOARD = 50;
+public static final int BOARD_SIZE = 50;
 public int spaceSize;
+public GameState gameState;
+
+public color blue;
+public color ground;
 
 public ArrayList<SnakeSpace> snake;
 public FoodSpace food;
@@ -24,8 +29,11 @@ public int highScore;
 void setup() {
   size(1000, 1000);
   frameRate(15);
-  spaceSize = width / BOARD;
-  highScore = 0;
+  blue = color(#5ddaff);
+  ground = color(#2d0e05);
+  gameState = GameState.PLAYING;
+  spaceSize = width / BOARD_SIZE;
+  highScore = 1;
   init();
 }
 
@@ -37,22 +45,32 @@ void init() {
   SnakeSpace head = new SnakeSpace(1, 1);
   head.setHead(true);
   snake.add(head);
-  food = new FoodSpace(BOARD, BOARD);
+  food = new FoodSpace(BOARD_SIZE, BOARD_SIZE);
   turns = new ArrayList<TurnSpace>();
   snakeAte = false;
-  gameOver = false;
 }
 
 /**
  * Draws the current state of the game.
  */
 void draw() {
-  background(color(#2d0e05));
-  gameOver = isGameOver();
-  if (gameOver) {
-    endScreen();
-  } else {
-    update();
+  background(ground);
+  isGameOver();
+  switch (gameState) {
+    case START:
+      //startScreen();
+      break;
+    case INSTRUCTIONS:
+      //instructionsScreen();
+      break;
+    case PLAYING:
+      playingScreen();
+      break;
+    case GAME_OVER:
+      endScreen();
+      break;
+    default:
+      throw new IllegalStateException("State of game does not exist.");
   }
 }
 
@@ -65,7 +83,7 @@ void endScreen() {
   textSize(100);
   text("game over :(", width/2, height/2);
   int padding = 0;
-  fill(#5ddaff);
+  fill(blue);
   textSize(20);
   padding = 40;
   if (snake.size() > highScore) {
@@ -85,10 +103,7 @@ void endScreen() {
 /**
  * Helper to the draw() function. Updates and draws the current game state.
  */
-void update() {
-  fill(255);
-  textAlign(CENTER);
-  textSize(100);
+void playingScreen() {
   ArrayList<TurnSpace> removeTurns = new ArrayList<TurnSpace>();
   food.drawSpace();
   for (SnakeSpace s : snake) {
@@ -99,7 +114,7 @@ void update() {
       }
     }
     if (s.samePosition(food)) {
-      food = new FoodSpace(BOARD, BOARD);
+      food = new FoodSpace(BOARD_SIZE, BOARD_SIZE);
       snakeAte = true;
     }
     if (!snakeAte) {
@@ -121,6 +136,9 @@ void update() {
   }
   textAlign(RIGHT);
   fill(255);
+  if (snake.size() > highScore) {
+    fill(blue);
+  }
   textSize(20);
   text("Length: " + snake.size(), width - 20, 40);
 }
@@ -130,6 +148,23 @@ void update() {
  * resets the world if R is pressed and game is over.
  */
 void keyPressed() {
+  switch (gameState) {
+    case START:
+      break;
+    case INSTRUCTIONS:
+      break;
+    case PLAYING:
+      keyHandlePlaying();
+      break;
+    case GAME_OVER:
+      keyHandleGameOver();
+      break;
+    default:
+      throw new IllegalStateException("State of game does not exist.");
+  }
+}
+
+void keyHandlePlaying() {
   SnakeSpace head = snake.get(0);
   if (key == CODED) {
     switch (keyCode) {
@@ -148,10 +183,15 @@ void keyPressed() {
       default:
         break;
     }
-  } else if (gameOver && (key == 'c' || key == 'C')) {
+  }
+}
+
+void keyHandleGameOver() {
+  if (key == 'c' || key == 'C') {
     if (snake.size() > highScore) {
       highScore = snake.size();
     }
+    gameState = GameState.PLAYING;
     init();
   }
 }
@@ -183,10 +223,15 @@ void addNewTurn(TurnSpace t) {
  * @return true if the game is over, false otherwise
  */
 boolean isGameOver() {
+  boolean over = false;
   for (int i = 1; i < snake.size(); i++) {
-    if (snake.get(i).equals(snake.get(0))) {
-      return true;
+    if (!over && snake.get(i).equals(snake.get(0))) {
+      over = true;
     }
   }
-  return snake.get(0).outOfBounds(BOARD - 1, BOARD - 1);
+  if (over || snake.get(0).outOfBounds(BOARD_SIZE - 1, BOARD_SIZE - 1)) {
+    gameState = GameState.GAME_OVER;
+    return true;
+  }
+  return false;
 }
