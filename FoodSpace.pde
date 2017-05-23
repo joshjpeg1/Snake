@@ -1,7 +1,7 @@
 /**
  * Represents a food space on the grid.
  */
-public class FoodSpace extends ASpace {
+public /*abstract*/ class FoodSpace extends ASpace {
   /**
    * Constructs a {@code FoodSpace}.
    *
