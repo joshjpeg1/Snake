@@ -31,7 +31,7 @@ public /*abstract*/ class FoodSpace extends ASpace {
    */
   @Override
   public color getColor() {
-    return color(#ff92ea);
+    return color(234);
     /*color[] rainbow = {color(#ff3e3e), color(#ffa83e), color(#f8ff3e), color(#3eff6c), color(#3e89ff), color(#b13eff)};
     return rainbow[int(random(rainbow.length))];*/
   }

@@ -35,3 +35,10 @@ void draw() {
 void keyPressed() {
   model.keyHandler();
 }
+
+/**
+ * Handles a mouse press when the program is running.
+ */
+void mousePressed() {
+  model.mouseHandler();
+}

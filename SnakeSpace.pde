@@ -34,9 +34,15 @@ public class SnakeSpace extends ASpace {
     this.direction = dir;
   }
   
+  /**
+   * Draws the space on the grid.
+   */
   @Override
-  public String toString() {
-    return "(" + x + ", " + y + ", " + direction.toString() + "," + head + ")";
+  public void drawSpace() {
+    noStroke();
+    fill(getColor());
+    rect(this.x * spaceSize, this.y * spaceSize,
+         spaceSize, spaceSize);
   }
   
   /**
@@ -47,9 +53,9 @@ public class SnakeSpace extends ASpace {
   @Override
   public color getColor() {
     if (head) {
-      return color(#9de83d);
+      return color(#2cff5e);
     } else {
-      return color(#7abc1d);
+      return color(#0edd48);
     }
   }
   

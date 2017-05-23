@@ -10,9 +10,12 @@ public class SnakeModel {
   private boolean snakeAte;
   private int highScore;
 
-  private color blue = color(#5ddaff);
+  private color white = color(255);
   private color ground = color(#2d0e05);
-  private color white = color(#ffffff);
+  private color blue = color(#3a7cef);
+  private color red = color(#ff3b4a);
+  
+  private PFont pixeled = createFont("Pixeled.ttf", 20);
   
   /**
    * Constructs a model of the game snake and starts the program.
@@ -20,7 +23,8 @@ public class SnakeModel {
   public SnakeModel() {
     frameRate(15);
     highScore = 1;
-    init();
+    textFont(pixeled);
+    gameState = GameState.START;
   }
   
   /**
@@ -45,19 +49,19 @@ public class SnakeModel {
    */
   public void update() {
     background(ground);
-    isGameOver();
     switch (gameState) {
       case START:
-        //drawStart();
+        updateStart();
         break;
       case INSTRUCTIONS:
-        //drawInstructions();
+        //updateInstructions();
         break;
       case PLAYING:
-        drawPlaying();
+        isGameOver();
+        updatePlaying();
         break;
       case GAME_OVER:
-        drawGameOver();
+        updateGameOver();
         break;
       default:
         throw new IllegalStateException("State of game does not exist.");
@@ -65,35 +69,22 @@ public class SnakeModel {
   }
   
   /**
-   * Helper to the update() function. Draws the end screen state.
+   * Helper to the update() function. Draws the start screen state.
    */
-  private void drawGameOver() {
+  private void updateStart() {
     fill(white);
     textAlign(CENTER);
     textSize(100);
-    text("game over :(", width/2, height/2);
-    int padding = 0;
+    text("snake", width/2, height/2);
     fill(blue);
     textSize(20);
-    padding = 40;
-    if (snake.size() > highScore) {
-      text("NEW HIGH SCORE: " + snake.size(), width/2, height/2 + padding);
-    } else {
-      text("HIGH SCORE: " + highScore, width/2, height/2 + padding);
-    }
-    fill(white);
-    textSize(20);
-    padding += 30;
-    text("score: " + snake.size(), width/2, height/2 + padding);
-    textSize(20);
-    padding += 30;
-    text("press C to continue", width/2, height/2 + padding);
+    text("click to start", width/2, height/2 + 40);
   }
   
   /**
-   * Helper to the update() function. Updates and draws the current game state.
+   * Helper to the update() function. Updates and draws the current playing state.
    */
-  private void drawPlaying() {
+  private void updatePlaying() {
     ArrayList<TurnSpace> removeTurns = new ArrayList<TurnSpace>();
     food.drawSpace();
     for (SnakeSpace s : snake) {
@@ -122,33 +113,48 @@ public class SnakeModel {
       fill(blue);
     }
     textSize(20);
-    text("Length: " + snake.size(), width - 20, 40);
+    text(snake.size(), width - 10, 40);
+  }
+  
+  /**
+   * Helper to the update() function. Draws the game over screen state.
+   */
+  private void updateGameOver() {
+    fill(white);
+    textAlign(CENTER);
+    textSize(100);
+    text("game over", width/2, height/2);
+    int padding = 0;
+    textSize(20);
+    padding = 60;
+    if (snake.size() > highScore) {
+      fill(blue);
+      text("NEW HIGH SCORE: " + snake.size(), width/2, height/2 + padding);
+    } else {
+      text("HIGH SCORE: " + highScore, width/2, height/2 + padding);
+    }
+    fill(white);
+    padding += 40;
+    text("score: " + snake.size(), width/2, height/2 + padding);
+    padding += 40;
+    text("press C to continue", width/2, height/2 + padding);
   }
   
   /**
    * Handles keys pressed based on the current game state.
    */
   public void keyHandler() {
-    switch (gameState) {
-      case START:
-        break;
-      case INSTRUCTIONS:
-        break;
-      case PLAYING:
-        keyHandlePlaying();
-        break;
-      case GAME_OVER:
-        keyHandleGameOver();
-        break;
-      default:
-        throw new IllegalStateException("State of game does not exist.");
+    if (gameState.equals(GameState.PLAYING)) {
+      keyHandlerPlaying();
+    } else if (gameState.equals(GameState.GAME_OVER)) {
+      keyHandlerGameOver();
     }
   }
   
   /**
    * Helper to the keyHandler() function. Handles keys for the PLAYING game state.
    */
-  private void keyHandlePlaying() {
+  private void keyHandlerPlaying() {
     SnakeSpace head = snake.get(0);
     if (key == CODED) {
       switch (keyCode) {
@@ -194,8 +200,14 @@ public class SnakeModel {
   /**
    * Helper to the keyHandler() function. Handles keys for the GAME_OVER game state.
    */
-  private void keyHandleGameOver() {
+  private void keyHandlerGameOver() {
     if (key == 'c' || key == 'C') {
+      init();
+    }
+  }
+  
+  public void mouseHandler() {
+    if (gameState.equals(GameState.START)) {
       init();
     }
   }

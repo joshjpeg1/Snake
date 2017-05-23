@@ -4,24 +4,6 @@
 public enum Direction {
   DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT, STILL;
   
-  @Override
-  public String toString() {
-    switch (this) {
-      case DIR_UP:
-        return "up";
-      case DIR_DOWN:
-        return "down";
-      case DIR_LEFT:
-        return "left";
-      case DIR_RIGHT:
-        return "right";
-      case STILL:
-        return "still";
-      default:
-        throw new IllegalStateException("Illegal state.");
-    }
-  }
-  
   /**
    * Checks whether it's a valid to turn in the given direction.
    *
