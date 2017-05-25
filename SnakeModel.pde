@@ -18,6 +18,7 @@ public class SnakeModel {
   
   
   private ArrayList<SnakeSpace> snake;
+  private ArrayList<SlimeSpace> slime;
   private ArrayList<AFoodSpace> foods;
   private ArrayList<TurnSpace> turns;
   private GameState gameState;
@@ -52,6 +53,7 @@ public class SnakeModel {
     if (snake != null && snake.size() > highScore) {
       highScore = snake.size();
     }
+    slime = new ArrayList<SlimeSpace>();
     snake = new ArrayList<SnakeSpace>();
     SnakeSpace head = new SnakeSpace(1, 1);
     head.setHead(true);
@@ -113,6 +115,12 @@ public class SnakeModel {
         eaten = f;
       }
     }
+    if (ate.equals(FoodType.SLIMER)) {
+      slime.add(new SlimeSpace(snake.get(snake.size() - 1).x, snake.get(snake.size() - 1).y));
+    }
+    for (SlimeSpace sl : slime) {
+      sl.drawSpace();
+    }
     for (SnakeSpace s : snake) {
       s.drawSnake(ate);
       for (TurnSpace t : turns) {
@@ -160,6 +168,7 @@ public class SnakeModel {
       effectTimer = 0;
       reverseMapping = false;
       frameRate(defaultFrameRate);
+      slime = new ArrayList<SlimeSpace>();
     }
   }
   
@@ -184,6 +193,9 @@ public class SnakeModel {
           break;
         case SLOW:
           foods.add(new SlowFoodSpace(BOARD_SIZE, BOARD_SIZE));
+          break;
+        case SLIMER:
+          foods.add(new SlimerFoodSpace(BOARD_SIZE, BOARD_SIZE));
           break;
         default:
           break;
@@ -314,6 +326,11 @@ public class SnakeModel {
     boolean over = false;
     for (int i = 1; i < snake.size(); i++) {
       if (!over && snake.get(i).equals(snake.get(0))) {
+        over = true;
+      }
+    }
+    for (SlimeSpace s : slime) {
+      if (!over && snake.get(0).samePosition(s)) {
         over = true;
       }
     }
