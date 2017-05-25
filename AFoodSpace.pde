@@ -27,8 +27,6 @@ public abstract class AFoodSpace extends ASpace {
   @Override
   public color getColor() {
     return color(234);
-    /*color[] rainbow = {color(#ff3e3e), color(#ffa83e), color(#f8ff3e), color(#3eff6c), color(#3e89ff), color(#b13eff)};
-    return rainbow[int(random(rainbow.length))];*/
   }
   
   /**
@@ -37,6 +35,6 @@ public abstract class AFoodSpace extends ASpace {
    * @param snake       a list of {@code SnakeSpace}s representing a snake
    * @throws IllegalArgumentException if given snake-list is null or size 0
    */
-  public abstract void eatEffect(ArrayList<SnakeSpace> snake, ArrayList<AFoodSpace> foods,
+  public abstract FoodType eatEffect(ArrayList<SnakeSpace> snake, ArrayList<AFoodSpace> foods, FoodType ate,
                                  int hiX, int hiY) throws IllegalArgumentException;
 }

@@ -18,8 +18,8 @@ public class DefaultFoodSpace extends AFoodSpace {
    * @param snake       a list of {@code SnakeSpace}s representing a snake
    * @throws IllegalArgumentException if given snake-list is null or size 0
    */
-  public void eatEffect(ArrayList<SnakeSpace> snake, ArrayList<AFoodSpace> foods, int hiX, int hiY)
-                        throws IllegalArgumentException {
+  public FoodType eatEffect(ArrayList<SnakeSpace> snake, ArrayList<AFoodSpace> foods, FoodType ate,
+                        int hiX, int hiY) throws IllegalArgumentException {
     if (snake == null || snake.size() == 0) {
       throw new IllegalArgumentException("Invalid snake passed.");
     }
@@ -28,8 +28,9 @@ public class DefaultFoodSpace extends AFoodSpace {
     }
     SnakeSpace newHead = new SnakeSpace(snake.get(0).x, snake.get(0).y, snake.get(0).direction);
     newHead.setHead(true);
-    newHead.move();
+    newHead.move(ate, hiX, hiY);
     snake.add(0, newHead);
     foods.add(new DefaultFoodSpace(hiX, hiY));
+    return FoodType.DEFAULT;
   }
 }

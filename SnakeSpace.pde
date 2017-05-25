@@ -34,13 +34,30 @@ public class SnakeSpace extends ASpace {
     this.direction = dir;
   }
   
+  @Override
+  public void drawSpace() {
+    drawSnake(null);
+  }
+  
   /**
    * Draws the space on the grid.
    */
-  @Override
-  public void drawSpace() {
+  public void drawSnake(FoodType ate) {
     noStroke();
-    fill(getColor());
+    if (ate == null) {
+      fill(getColor());
+    } else {
+      switch (ate) {
+        case DECAPITATOR:
+          //fill(new DecapitatorFoodSpace(0, 0).getColor());
+          break;
+        case STAR:
+          fill(new StarFoodSpace(0, 0).getColor());
+          break;
+        default:
+          fill(getColor());
+      }
+    }
     rect(this.x * spaceSize, this.y * spaceSize,
          spaceSize, spaceSize);
   }
@@ -54,9 +71,8 @@ public class SnakeSpace extends ASpace {
   public color getColor() {
     if (head) {
       return color(#2cff5e);
-    } else {
-      return color(#0edd48);
     }
+    return color(#0edd48);
   }
   
   /**
@@ -77,7 +93,7 @@ public class SnakeSpace extends ASpace {
    * @return true if the same position, false otherwise
    * throws IllegalStateException if direction is not up, down, left, or right
    */
-  public void move() throws IllegalStateException {
+  public void move(FoodType ate, int hiX, int hiY) throws IllegalStateException {
     switch (direction) {
       case DIR_UP:
         this.y -= 1;
@@ -95,6 +111,18 @@ public class SnakeSpace extends ASpace {
         break;
       default:
         throw new IllegalStateException("Cannot move that way.");
+    }
+    if (ate == FoodType.STAR) {
+      if (this.x < 0) {
+        this.x = hiX;
+      } else if (this.x > hiX) {
+        this.x = 0;
+      }
+      if (this.y < 0) {
+        this.y = hiY;
+      } else if (this.y > hiY) {
+        this.y = 0;
+      }
     }
   }
   

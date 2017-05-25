@@ -2,19 +2,25 @@
  * Represents the model, or logic, of the game.
  */
 public class SnakeModel {
-  private ArrayList<SnakeSpace> snake;
-  private ArrayList<AFoodSpace> foods;
-  private ArrayList<TurnSpace> turns;
-  private GameState gameState;
-  private int highScore;
-
   private final color white = color(255);
   private final color ground = color(#2d0e05);
   private final color blue = color(#3a7cef);
   private final color red = color(#ff3b4a);
   private final color green = color(#0edd48);
   private final color gray = color(#afafaf);
-  private PFont pixeled = createFont("Pixeled.ttf", 20);
+  private final PFont pixeled = createFont("Pixeled.ttf", 20);
+  
+  private ArrayList<SnakeSpace> snake;
+  private ArrayList<AFoodSpace> foods;
+  private ArrayList<TurnSpace> turns;
+  private GameState gameState;
+  private int highScore;
+  
+  private int effectTimer;
+  private int spawnTimer;
+  private int foodSpawnWait = 2000;
+  private int foodEffectWait = 6000;
+  private FoodType ate = FoodType.DEFAULT;
   
   /**
    * Constructs a model of the game snake and starts the program.
@@ -30,6 +36,8 @@ public class SnakeModel {
    * Initializes/Resets the world back to its original state.
    */
   private void init() {
+    spawnTimer = 0;
+    effectTimer = 0;
     gameState = GameState.PLAYING;
     if (snake != null && snake.size() > highScore) {
       highScore = snake.size();
@@ -84,6 +92,7 @@ public class SnakeModel {
    * Helper to the update() function. Updates and draws the current playing state.
    */
   private void updatePlaying() {
+    checkTimer();
     ArrayList<TurnSpace> removeTurns = new ArrayList<TurnSpace>();
     AFoodSpace eaten = null;
     for (AFoodSpace f : foods) {
@@ -95,16 +104,20 @@ public class SnakeModel {
       }
     }
     for (SnakeSpace s : snake) {
-      s.drawSpace();
+      s.drawSnake(ate);
       for (TurnSpace t : turns) {
         if (s.turn(t) && snake.indexOf(s) == snake.size() - 1) {
           removeTurns.add(t);
         }
       }
-      s.move();
+      s.move(ate, BOARD_SIZE - 1, BOARD_SIZE - 1);
     }
     if (eaten != null) {
-      eaten.eatEffect(snake, foods, BOARD_SIZE, BOARD_SIZE);
+      FoodType change = eaten.eatEffect(snake, foods, ate, BOARD_SIZE, BOARD_SIZE);
+      if (!change.equals(FoodType.DEFAULT)) {
+        ate = change;
+      }
+      effectTimer = millis();
       foods.remove(eaten);
     }
     for (TurnSpace t : removeTurns) {
@@ -234,5 +247,40 @@ public class SnakeModel {
       return true;
     }
     return false;
+  }
+  
+  private void checkTimer() {
+    if (snake.size() > 4 && foods.size() == 1) {
+      if (spawnTimer == 0) {
+        spawnTimer = millis();
+      } else if (millis() - spawnTimer >= foodSpawnWait) {
+        spawnTimer = 0;
+        randomFood();
+      }
+    }
+    if (ate != FoodType.DEFAULT && millis() - effectTimer >= foodEffectWait) {
+      ate = FoodType.DEFAULT;
+      effectTimer = 0;
+    }
+  }
+  
+  private void randomFood() {
+    FoodType which = FoodType.values()[int(random(FoodType.values().length))];
+    //if (which.willSpawn()) {
+      switch (which) {
+        case DECAPITATOR:
+          foods.add(new DecapitatorFoodSpace(BOARD_SIZE, BOARD_SIZE));
+          break;
+        case STAR:
+          foods.add(new StarFoodSpace(BOARD_SIZE, BOARD_SIZE));
+          break;
+        case EXPLODER:
+          foods.add(new ExploderFoodSpace(BOARD_SIZE, BOARD_SIZE));
+          break;
+        default:
+          break;
+      }
+    //}
+    System.out.println(which);
   }
 }
