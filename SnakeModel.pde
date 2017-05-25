@@ -2,6 +2,7 @@
  * Represents the model, or logic, of the game.
  */
 public class SnakeModel {
+  public static final int defaultFrameRate = 20;
   private final color white = color(255);
   private final color ground = color(#2d0e05);
   private final color blue = color(#3a7cef);
@@ -9,6 +10,12 @@ public class SnakeModel {
   private final color green = color(#0edd48);
   private final color gray = color(#afafaf);
   private final PFont pixeled = createFont("Pixeled.ttf", 20);
+  private final int[] mappedKeys = {UP, DOWN, LEFT, RIGHT};
+  private final int[] revMappedKeys = {DOWN, UP, RIGHT, LEFT};
+  private final int foodSpawnWait = 750;
+  private final int foodDespawnWait = 4000;
+  private final int foodEffectWait = 6000;
+  
   
   private ArrayList<SnakeSpace> snake;
   private ArrayList<AFoodSpace> foods;
@@ -16,17 +23,18 @@ public class SnakeModel {
   private GameState gameState;
   private int highScore;
   
+  
+  private boolean reverseMapping;
   private int effectTimer;
   private int spawnTimer;
-  private int foodSpawnWait = 2000;
-  private int foodEffectWait = 6000;
+  private int despawnTimer;
   private FoodType ate = FoodType.DEFAULT;
   
   /**
    * Constructs a model of the game snake and starts the program.
    */
   public SnakeModel() {
-    frameRate(15);
+    frameRate(defaultFrameRate);
     highScore = 1;
     textFont(pixeled);
     gameState = GameState.START;
@@ -36,7 +44,9 @@ public class SnakeModel {
    * Initializes/Resets the world back to its original state.
    */
   private void init() {
+    reverseMapping = false;
     spawnTimer = 0;
+    despawnTimer = 0;
     effectTimer = 0;
     gameState = GameState.PLAYING;
     if (snake != null && snake.size() > highScore) {
@@ -112,14 +122,7 @@ public class SnakeModel {
       }
       s.move(ate, BOARD_SIZE - 1, BOARD_SIZE - 1);
     }
-    if (eaten != null) {
-      FoodType change = eaten.eatEffect(snake, foods, ate, BOARD_SIZE, BOARD_SIZE);
-      if (!change.equals(FoodType.DEFAULT)) {
-        ate = change;
-      }
-      effectTimer = millis();
-      foods.remove(eaten);
-    }
+    eatFood(eaten);
     for (TurnSpace t : removeTurns) {
       turns.remove(t);
     }
@@ -130,6 +133,81 @@ public class SnakeModel {
     }
     textSize(20);
     text(snake.size(), width - 10, 40);
+  }
+  
+  private void checkTimer() {
+    if (snake.size() >= 5) {
+      if (spawnTimer == 0) {
+        spawnTimer = millis();
+      } else if (millis() - spawnTimer >= foodSpawnWait) {
+        spawnTimer = 0;
+        if (randomFood() && foods.size() == 2) {
+          despawnTimer = millis();
+        }
+      }
+    }
+    if (millis() - despawnTimer >= foodDespawnWait) {
+      for (int i = 1; i < foods.size(); i++) {
+        foods.remove(i);
+      }
+      if (ate.equals(FoodType.EXPLODER)) {
+        ate = FoodType.DEFAULT;
+      }
+      despawnTimer = 0;
+    }
+    if (!ate.equals(FoodType.DEFAULT) && millis() - effectTimer >= foodEffectWait) {
+      ate = FoodType.DEFAULT;
+      effectTimer = 0;
+      reverseMapping = false;
+      frameRate(defaultFrameRate);
+    }
+  }
+  
+  private boolean randomFood() {
+    FoodType which = FoodType.values()[int(random(FoodType.values().length))];
+    if (which.willSpawn()) {
+      switch (which) {
+        case DECAPITATOR:
+          foods.add(new DecapitatorFoodSpace(BOARD_SIZE, BOARD_SIZE));
+          break;
+        case REVERSE:
+          foods.add(new ReverseFoodSpace(BOARD_SIZE, BOARD_SIZE));
+          break;
+        case EXPLODER:
+          foods.add(new ExploderFoodSpace(BOARD_SIZE, BOARD_SIZE));
+          break;
+        case STAR:
+          foods.add(new StarFoodSpace(BOARD_SIZE, BOARD_SIZE));
+          break;
+        case FAST:
+          foods.add(new FastFoodSpace(BOARD_SIZE, BOARD_SIZE));
+          break;
+        case SLOW:
+          foods.add(new SlowFoodSpace(BOARD_SIZE, BOARD_SIZE));
+          break;
+        default:
+          break;
+      }
+      return true;
+    }
+    return false;
+  }
+  
+  private void eatFood(AFoodSpace eaten) {
+    if (eaten != null) {
+      FoodType change = eaten.eatEffect(snake, foods, ate, BOARD_SIZE, BOARD_SIZE);
+      if (!change.equals(FoodType.DEFAULT)) {
+        ate = change;
+        if (despawnTimer == 0) {
+          despawnTimer = millis();
+        }
+        effectTimer = millis();
+        if (ate.equals(FoodType.REVERSE)) {
+          reverseMapping = true;
+        }
+      }
+      foods.remove(eaten);
+    }
   }
   
   /**
@@ -174,22 +252,19 @@ public class SnakeModel {
    */
   private void keyHandlerPlaying() {
     SnakeSpace head = snake.get(0);
+    int[] keys = mappedKeys;
+    if (reverseMapping) {
+     keys = revMappedKeys;
+    }
     if (key == CODED) {
-      switch (keyCode) {
-        case UP:
+      if (keyCode == keys[0]) {
           addNewTurn(new TurnSpace(head.x, head.y, Direction.DIR_UP));
-          break;
-        case DOWN:
+      } else if (keyCode == keys[1]) {
           addNewTurn(new TurnSpace(head.x, head.y, Direction.DIR_DOWN));
-          break;
-        case LEFT:
+      } else if (keyCode == keys[2]) {
           addNewTurn(new TurnSpace(head.x, head.y, Direction.DIR_LEFT));
-          break;
-        case RIGHT:
+      } else if (keyCode == keys[3]) {
           addNewTurn(new TurnSpace(head.x, head.y, Direction.DIR_RIGHT));
-          break;
-        default:
-          break;
       }
     }
   }
@@ -242,45 +317,10 @@ public class SnakeModel {
         over = true;
       }
     }
-    if (over || snake.get(0).outOfBounds(BOARD_SIZE - 1, BOARD_SIZE - 1)) {
+    if (over || snake.get(0).outOfBounds(BOARD_SIZE - 1, BOARD_SIZE - 1) || snake.size() == 0) {
       gameState = GameState.GAME_OVER;
       return true;
     }
     return false;
-  }
-  
-  private void checkTimer() {
-    if (snake.size() > 4 && foods.size() == 1) {
-      if (spawnTimer == 0) {
-        spawnTimer = millis();
-      } else if (millis() - spawnTimer >= foodSpawnWait) {
-        spawnTimer = 0;
-        randomFood();
-      }
-    }
-    if (ate != FoodType.DEFAULT && millis() - effectTimer >= foodEffectWait) {
-      ate = FoodType.DEFAULT;
-      effectTimer = 0;
-    }
-  }
-  
-  private void randomFood() {
-    FoodType which = FoodType.values()[int(random(FoodType.values().length))];
-    //if (which.willSpawn()) {
-      switch (which) {
-        case DECAPITATOR:
-          foods.add(new DecapitatorFoodSpace(BOARD_SIZE, BOARD_SIZE));
-          break;
-        case STAR:
-          foods.add(new StarFoodSpace(BOARD_SIZE, BOARD_SIZE));
-          break;
-        case EXPLODER:
-          foods.add(new ExploderFoodSpace(BOARD_SIZE, BOARD_SIZE));
-          break;
-        default:
-          break;
-      }
-    //}
-    System.out.println(which);
   }
 }

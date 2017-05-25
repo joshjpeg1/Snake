@@ -4,8 +4,8 @@
  
  import java.util.Random;
  
-public enum FoodType {
-  DEFAULT(1), DECAPITATOR(5), SLIMER(10), EXPLODER(15), STAR(20);
+public static enum FoodType {
+  DEFAULT(1), DECAPITATOR(2), FAST(3), SLOW(3), EXPLODER(5), SLIMER(5), REVERSE(5), STAR(12);
   
   private int spawnRate;
   

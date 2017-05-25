@@ -30,7 +30,9 @@ public class DefaultFoodSpace extends AFoodSpace {
     newHead.setHead(true);
     newHead.move(ate, hiX, hiY);
     snake.add(0, newHead);
-    foods.add(new DefaultFoodSpace(hiX, hiY));
+    if (!ate.equals(FoodType.EXPLODER)) {
+      foods.add(0, new DefaultFoodSpace(hiX, hiY));
+    }
     return FoodType.DEFAULT;
   }
 }

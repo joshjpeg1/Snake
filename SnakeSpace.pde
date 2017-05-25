@@ -49,10 +49,19 @@ public class SnakeSpace extends ASpace {
     } else {
       switch (ate) {
         case DECAPITATOR:
-          //fill(new DecapitatorFoodSpace(0, 0).getColor());
+          fill(new DecapitatorFoodSpace(0, 0).getColor());
           break;
         case STAR:
           fill(new StarFoodSpace(0, 0).getColor());
+          break;
+        case REVERSE:
+          fill(new ReverseFoodSpace(0, 0).getColor());
+          break;
+        case FAST:
+          fill(new FastFoodSpace(0, 0).getColor());
+          break;
+        case SLOW:
+          fill(new SlowFoodSpace(0, 0).getColor());
           break;
         default:
           fill(getColor());
@@ -112,7 +121,7 @@ public class SnakeSpace extends ASpace {
       default:
         throw new IllegalStateException("Cannot move that way.");
     }
-    if (ate == FoodType.STAR) {
+    if (ate.equals(FoodType.STAR) || ate.equals(FoodType.REVERSE)) {
       if (this.x < 0) {
         this.x = hiX;
       } else if (this.x > hiX) {
