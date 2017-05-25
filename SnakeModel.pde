@@ -50,7 +50,7 @@ public class SnakeModel {
     head.setHead(true);
     snake.add(head);
     foods = new ArrayList<AFoodSpace>();
-    foods.add(new DefaultFoodSpace(BOARD_SIZE, BOARD_SIZE));
+    foods.add(new DefaultFoodSpace());
     turns = new ArrayList<TurnSpace>();
   }
   
@@ -153,25 +153,25 @@ public class SnakeModel {
     if (which.willSpawn()) {
       switch (which) {
         case DECAPITATOR:
-          foods.add(new DecapitatorFoodSpace(BOARD_SIZE, BOARD_SIZE));
+          foods.add(new DecapitatorFoodSpace());
           break;
         case REVERSE:
-          foods.add(new ReverseFoodSpace(BOARD_SIZE, BOARD_SIZE));
+          foods.add(new ReverseFoodSpace());
           break;
         case EXPLODER:
-          foods.add(new ExploderFoodSpace(BOARD_SIZE, BOARD_SIZE));
+          foods.add(new ExploderFoodSpace());
           break;
         case STAR:
-          foods.add(new StarFoodSpace(BOARD_SIZE, BOARD_SIZE));
+          foods.add(new StarFoodSpace());
           break;
         case FAST:
-          foods.add(new FastFoodSpace(BOARD_SIZE, BOARD_SIZE));
+          foods.add(new FastFoodSpace());
           break;
         case SLOW:
-          foods.add(new SlowFoodSpace(BOARD_SIZE, BOARD_SIZE));
+          foods.add(new SlowFoodSpace());
           break;
         case SLIMER:
-          foods.add(new SlimerFoodSpace(BOARD_SIZE, BOARD_SIZE));
+          foods.add(new SlimerFoodSpace());
           break;
         default:
           break;

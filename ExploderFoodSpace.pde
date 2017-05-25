@@ -8,8 +8,8 @@ public class ExploderFoodSpace extends AFoodSpace {
    * @param hiX   the upper-bound of the x-position
    * @param hiY   the upper-bound of the y-position
    */
-  public ExploderFoodSpace(int hiX, int hiY) {
-    super(hiX, hiY);
+  public ExploderFoodSpace() {
+    super();
   }
   
   @Override

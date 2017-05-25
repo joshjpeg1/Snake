@@ -8,8 +8,8 @@ public class DefaultFoodSpace extends AFoodSpace {
    * @param hiX   the upper-bound of the x-position
    * @param hiY   the upper-bound of the y-position
    */
-  public DefaultFoodSpace(int hiX, int hiY) {
-    super(hiX, hiY);
+  public DefaultFoodSpace() {
+    super();
   }
   
   /**

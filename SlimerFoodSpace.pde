@@ -8,8 +8,8 @@ public class SlimerFoodSpace extends AFoodSpace {
    * @param hiX   the upper-bound of the x-position
    * @param hiY   the upper-bound of the y-position
    */
-  public SlimerFoodSpace(int hiX, int hiY) {
-    super(hiX, hiY);
+  public SlimerFoodSpace() {
+    super();
   }
   
   @Override

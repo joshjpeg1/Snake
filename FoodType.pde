@@ -2,10 +2,12 @@
  * Represents the different types of food.
  */
  
- import java.util.Random;
+import java.util.Random;
  
 public static enum FoodType {
-  DEFAULT(1), DECAPITATOR(2), FAST(3), SLOW(3), EXPLODER(5), SLIMER(5), REVERSE(5), STAR(12);
+  DEFAULT(1), DECAPITATOR(2), FAST(3),
+  SLOW(3), EXPLODER(5), SLIMER(5),
+  REVERSE(5), STAR(12);
   
   private int spawnRate;
   

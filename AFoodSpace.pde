@@ -8,9 +8,9 @@ public abstract class AFoodSpace extends ASpace {
    * @param hiX   the upper-bound of the x-position
    * @param hiY   the upper-bound of the y-position
    */
-  public AFoodSpace(int hiX, int hiY) {
+  public AFoodSpace() {
     super(0, 0);
-    randomSpace(hiX, hiY);
+    randomSpace(snake.BOARD_SIZE, snake.BOARD_SIZE);
   }
   
   /**

@@ -8,8 +8,8 @@ public class ReverseFoodSpace extends AFoodSpace {
    * @param hiX   the upper-bound of the x-position
    * @param hiY   the upper-bound of the y-position
    */
-  public ReverseFoodSpace(int hiX, int hiY) {
-    super(hiX, hiY);
+  public ReverseFoodSpace() {
+    super();
   }
   
   @Override

@@ -8,8 +8,8 @@ public class DecapitatorFoodSpace extends AFoodSpace {
    * @param hiX   the upper-bound of the x-position
    * @param hiY   the upper-bound of the y-position
    */
-  public DecapitatorFoodSpace(int hiX, int hiY) {
-    super(hiX, hiY);
+  public DecapitatorFoodSpace() {
+    super();
   }
   
   @Override
