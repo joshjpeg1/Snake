@@ -91,7 +91,10 @@ public class SnakeModel {
       }
     }
     if (ate.equals(FoodType.SLIMER)) {
-      slime.add(new SlimeSpace(snake.get(snake.size() - 1).x, snake.get(snake.size() - 1).y));
+      SnakeSpace last = snake.get(snake.size() - 1);
+      if (!last.direction.equals(Direction.STILL)) {
+        slime.add(new SlimeSpace(last.x, last.y));
+      }
     }
     for (SnakeSpace s : snake) {
       for (TurnSpace t : turns) {

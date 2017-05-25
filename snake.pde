@@ -5,9 +5,9 @@
  * @title        Snake
  * @description  A game where users play as a snake, maneuvering around the map and themself
                  to get food and become larger.
- * @version      1.0.3
+ * @version      1.1
  */
- 
+
 public static final int BOARD_SIZE = 50;
 public int spaceSize;
 public SnakeModel model;
