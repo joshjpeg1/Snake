@@ -3,19 +3,11 @@
  */
 public class SnakeModel {
   public static final int defaultFrameRate = 20;
-  private final color white = color(255);
-  private final color ground = color(#2d0e05);
-  private final color blue = color(#3a7cef);
-  private final color red = color(#ff3b4a);
-  private final color green = color(#0edd48);
-  private final color gray = color(#afafaf);
-  private final PFont pixeled = createFont("Pixeled.ttf", 20);
   private final int[] mappedKeys = {UP, DOWN, LEFT, RIGHT};
   private final int[] revMappedKeys = {DOWN, UP, RIGHT, LEFT};
   private final int foodSpawnWait = 750;
   private final int foodDespawnWait = 4000;
   private final int foodEffectWait = 6000;
-  
   
   private ArrayList<SnakeSpace> snake;
   private ArrayList<SlimeSpace> slime;
@@ -24,12 +16,12 @@ public class SnakeModel {
   private GameState gameState;
   private int highScore;
   
-  
   private boolean reverseMapping;
   private int effectTimer;
   private int spawnTimer;
   private int despawnTimer;
   private FoodType ate = FoodType.DEFAULT;
+  private SnakeView view = new SnakeView();
   
   /**
    * Constructs a model of the game snake and starts the program.
@@ -37,7 +29,6 @@ public class SnakeModel {
   public SnakeModel() {
     frameRate(defaultFrameRate);
     highScore = 1;
-    textFont(pixeled);
     gameState = GameState.START;
   }
   
@@ -67,10 +58,10 @@ public class SnakeModel {
    * Draws an update of the model, based on the current game state.
    */
   public void update() {
-    background(ground);
+    view.display(gameState, snake, foods, slime, ate, highScore);
     switch (gameState) {
       case START:
-        updateStart();
+        //updateStart();
         break;
       case INSTRUCTIONS:
         //updateInstructions();
@@ -80,24 +71,11 @@ public class SnakeModel {
         updatePlaying();
         break;
       case GAME_OVER:
-        updateGameOver();
+        //updateGameOver();
         break;
       default:
         throw new IllegalStateException("State of game does not exist.");
     }
-  }
-  
-  /**
-   * Helper to the update() function. Draws the start screen state.
-   */
-  private void updateStart() {
-    fill(white);
-    textAlign(CENTER);
-    textSize(100);
-    text("snake", width/2, height/2);
-    fill(green);
-    textSize(20);
-    text("click to start", width/2, height/2 + 40);
   }
   
   /**
@@ -108,9 +86,6 @@ public class SnakeModel {
     ArrayList<TurnSpace> removeTurns = new ArrayList<TurnSpace>();
     AFoodSpace eaten = null;
     for (AFoodSpace f : foods) {
-      f.drawSpace();
-    }
-    for (AFoodSpace f : foods) {
       if (eaten == null && snake.get(0).samePosition(f)) {
         eaten = f;
       }
@@ -118,11 +93,7 @@ public class SnakeModel {
     if (ate.equals(FoodType.SLIMER)) {
       slime.add(new SlimeSpace(snake.get(snake.size() - 1).x, snake.get(snake.size() - 1).y));
     }
-    for (SlimeSpace sl : slime) {
-      sl.drawSpace();
-    }
     for (SnakeSpace s : snake) {
-      s.drawSnake(ate);
       for (TurnSpace t : turns) {
         if (s.turn(t) && snake.indexOf(s) == snake.size() - 1) {
           removeTurns.add(t);
@@ -134,13 +105,6 @@ public class SnakeModel {
     for (TurnSpace t : removeTurns) {
       turns.remove(t);
     }
-    textAlign(RIGHT);
-    fill(white);
-    if (snake.size() > highScore) {
-      fill(blue);
-    }
-    textSize(20);
-    text(snake.size(), width - 10, 40);
   }
   
   /**
@@ -237,32 +201,6 @@ public class SnakeModel {
       }
       foods.remove(eaten);
     }
-  }
-  
-  /**
-   * Helper to the update() function. Draws the game over screen state.
-   */
-  private void updateGameOver() {
-    fill(white);
-    textAlign(CENTER);
-    textSize(100);
-    text("game over", width/2, height/2);
-    int padding = 0;
-    textSize(20);
-    padding = 60;
-    if (snake.size() > highScore) {
-      fill(blue);
-      text("NEW HIGH SCORE: " + snake.size(), width/2, height/2 + padding);
-    } else {
-      fill(gray);
-      text("high score: " + highScore, width/2, height/2 + padding);
-    }
-    fill(gray);
-    padding += 40;
-    text("score: " + snake.size(), width/2, height/2 + padding);
-    padding += 40;
-    fill(green);
-    text("continue", width/2, height/2 + padding);
   }
   
   /**
