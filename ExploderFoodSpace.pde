@@ -36,7 +36,7 @@ public class ExploderFoodSpace extends AFoodSpace {
     }
     int willRun = int(random(10)) + 1;
     for (int i = 0; i < willRun; i++) {
-      foods.add(new DefaultFoodSpace(hiX, hiY));
+      foods.add(new DefaultFoodSpace());
     }
     return FoodType.EXPLODER;
   }

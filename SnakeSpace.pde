@@ -52,19 +52,19 @@ public class SnakeSpace extends ASpace {
     } else {
       switch (ate) {
         case DECAPITATOR:
-          fill(new DecapitatorFoodSpace(0, 0).getColor());
+          fill(new DecapitatorFoodSpace().getColor());
           break;
         case STAR:
-          fill(new StarFoodSpace(0, 0).getColor());
+          fill(new StarFoodSpace().getColor());
           break;
         case REVERSE:
-          fill(new ReverseFoodSpace(0, 0).getColor());
+          fill(new ReverseFoodSpace().getColor());
           break;
         case FAST:
-          fill(new FastFoodSpace(0, 0).getColor());
+          fill(new FastFoodSpace().getColor());
           break;
         case SLOW:
-          fill(new SlowFoodSpace(0, 0).getColor());
+          fill(new SlowFoodSpace().getColor());
           break;
         default:
           fill(getColor());
