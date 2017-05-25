@@ -40,7 +40,10 @@ public class SnakeSpace extends ASpace {
   }
   
   /**
-   * Draws the space on the grid.
+   * Draws the snake on the grid, with colors depending on which
+   * food it ate.
+   *
+   * @param ate      the type of food this snake has eaten
    */
   public void drawSnake(FoodType ate) {
     noStroke();

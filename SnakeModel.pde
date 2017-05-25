@@ -104,7 +104,7 @@ public class SnakeModel {
    * Helper to the update() function. Updates and draws the current playing state.
    */
   private void updatePlaying() {
-    checkTimer();
+    updateTimer();
     ArrayList<TurnSpace> removeTurns = new ArrayList<TurnSpace>();
     AFoodSpace eaten = null;
     for (AFoodSpace f : foods) {
@@ -143,7 +143,14 @@ public class SnakeModel {
     text(snake.size(), width - 10, 40);
   }
   
-  private void checkTimer() {
+  /**
+   * Helper to the updatePlaying() function.
+   * Checks if the spawn timer is finished, and if so, spawns a new food on the board.
+   * Checks if the despawn timer is finished, and if so, despawns all special foods from the board.
+   * Checks if the effect timer is finished, and if so, removes the special effect from the snake and game.
+   * If not for any of the above, it starts the timer at the appropriate time.
+   */
+  private void updateTimer() {
     if (snake.size() >= 5) {
       if (spawnTimer == 0) {
         spawnTimer = millis();
@@ -172,6 +179,11 @@ public class SnakeModel {
     }
   }
   
+  /**
+   * Helper to the updateTimer() function. Randomly spawns a random type of food on the map.
+   *
+   * @return true if a food is spawned, false otherwise
+   */
   private boolean randomFood() {
     FoodType which = FoodType.values()[int(random(FoodType.values().length))];
     if (which.willSpawn()) {
@@ -205,6 +217,12 @@ public class SnakeModel {
     return false;
   }
   
+  /**
+   * Helper to the updatePlaying() function.
+   * Handles eaten food effects and starts the effect timer.
+   * Restarts the despawn timer if over.
+   * Removes the eaten food from the foods list.
+   */
   private void eatFood(AFoodSpace eaten) {
     if (eaten != null) {
       FoodType change = eaten.eatEffect(snake, foods, ate, BOARD_SIZE, BOARD_SIZE);

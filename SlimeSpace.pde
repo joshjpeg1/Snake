@@ -1,13 +1,12 @@
 /**
- * Represents a turning space on the grid.
+ * Represents a slime space on the grid.
  */
 public class SlimeSpace extends ASpace {
   /**
-   * Constructs a {@code TurnSpace}.
+   * Constructs a {@code SlimeSpace}.
    *
    * @param x       the x-position
    * @param y       the y-position
-   * @param dir     the direction of the turn
    */
   public SlimeSpace(int x, int y) {
     super(x, y);
