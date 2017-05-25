@@ -228,12 +228,11 @@ public class SnakeModel {
       FoodType change = eaten.eatEffect(snake, foods, ate, BOARD_SIZE, BOARD_SIZE);
       if (!change.equals(FoodType.DEFAULT)) {
         ate = change;
-        if (despawnTimer == 0) {
-          despawnTimer = millis();
-        }
         effectTimer = millis();
         if (ate.equals(FoodType.REVERSE)) {
           reverseMapping = true;
+        } else if (ate.equals(FoodType.EXPLODER)) {
+          despawnTimer = millis();
         }
       }
       foods.remove(eaten);
