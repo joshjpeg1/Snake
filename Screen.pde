@@ -163,7 +163,7 @@ public class Screen {
    */
   public GameState useButton() {
     for (ScreenButton b : this.buttons) {
-      if (b.getFocus() && (mousePressed && b.hover(mouseX, mouseY))) {
+      if (b.getFocus() && (!mousePressed || (mousePressed && b.hover(mouseX, mouseY)))) {
         resetFocus();
         return b.getAction();
       }

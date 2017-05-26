@@ -29,7 +29,6 @@ public class SnakeView {
    * Constructs a {@code SnakeView} object.
    */
   public SnakeView() {
-    frameRate(30);
     textFont(pixeled);
   }
   
@@ -56,7 +55,6 @@ public class SnakeView {
         displayInstructions();
         break;
       case PLAYING:
-        frameRate(defaultFrameRate);
         displayPlaying(snake, foods, slime, ate, highScore);
         break;
       case GAME_OVER:

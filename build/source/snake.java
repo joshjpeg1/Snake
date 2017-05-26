@@ -4,6 +4,7 @@ import processing.event.*;
 import processing.opengl.*; 
 
 import java.util.Random; 
+import java.util.Arrays; 
 
 import java.util.HashMap; 
 import java.util.ArrayList; 
@@ -173,7 +174,7 @@ public abstract class ASpace {
 /**
  * Represents the decapitator food on the grid.
  */
-public class DecapitatorFoodSpace extends AFoodSpace {
+public final class DecapitatorFoodSpace extends AFoodSpace {
   /**
    * Constructs a {@code DecapitatorFoodSpace}.
    *
@@ -213,7 +214,7 @@ public class DecapitatorFoodSpace extends AFoodSpace {
 /**
  * Represents the default food on the grid.
  */
-public class DefaultFoodSpace extends AFoodSpace {
+public final class DefaultFoodSpace extends AFoodSpace {
   /**
    * Constructs a {@code DefaultFoodSpace}.
    *
@@ -280,7 +281,7 @@ public enum Direction {
 /**
  * Represents the exploder food on the grid.
  */
-public class ExploderFoodSpace extends AFoodSpace {
+public final class ExploderFoodSpace extends AFoodSpace {
   /**
    * Constructs a {@code ExploderFoodSpace}.
    *
@@ -323,7 +324,7 @@ public class ExploderFoodSpace extends AFoodSpace {
 /**
  * Represents the fast food on the grid.
  */
-public class FastFoodSpace extends AFoodSpace {
+public final class FastFoodSpace extends AFoodSpace {
   /**
    * Constructs a {@code FastFoodSpace}.
    *
@@ -354,16 +355,15 @@ public class FastFoodSpace extends AFoodSpace {
     if (snake == null || snake.size() == 0 || foods == null) {
       throw new IllegalArgumentException("Invalid lists passed.");
     }
-    frameRate(SnakeModel.defaultFrameRate * 3);
+    frameRate(SnakeView.defaultFrameRate * 3);
     return FoodType.FAST;
   }
 }
+
+ 
 /**
  * Represents the different types of food.
  */
- 
-
- 
 public static enum FoodType {
   DEFAULT(1), DECAPITATOR(2), FAST(3),
   SLOW(3), EXPLODER(5), SLIMER(5),
@@ -371,10 +371,20 @@ public static enum FoodType {
   
   private int spawnRate;
   
+  /**
+   * Constructs a {@code FoodType} object;
+   *
+   * @param spawnRate     the rate at which the food spawns
+   */
   private FoodType(int spawnRate) {
     this.spawnRate = spawnRate;
   }
   
+  /**
+   * Uses a RNG to determine if the food will spawn.
+   *
+   * @return true if it will spawn, false otherwise
+   */
   public boolean willSpawn() {
     Random rand = new Random();
     return rand.nextInt(this.spawnRate) < 1;
@@ -389,7 +399,7 @@ public enum GameState {
 /**
  * Represents the reverse food on the grid.
  */
-public class ReverseFoodSpace extends AFoodSpace {
+public final class ReverseFoodSpace extends AFoodSpace {
   /**
    * Constructs a {@code ReverseFoodSpace}.
    *
@@ -425,9 +435,358 @@ public class ReverseFoodSpace extends AFoodSpace {
   }
 }
 /**
+ * Represents a screen in the program.
+ */
+public class Screen {
+  private ScreenText header;
+  private ArrayList<ScreenText> body;
+  private ArrayList<ScreenButton> buttons;
+  private static final int SECTION_PADDING = ScreenText.PADDING * 2;
+  
+  private final int white = color(255);
+  private final int ground = color(0xff2d0e05);
+  private final int blue = color(0xff3a7cef);
+  private final int red = color(0xffff3b4a);
+  private final int green = color(0xff0edd48);
+  private final int gray = color(0xffafafaf);
+  private PShape cursor;
+  
+  /**
+   * Constructs a {@code Screen} object.
+   *
+   * @param hText       the text for the header
+   * @param bText       the text for each of the body texts
+   * @param btns        the text for each of the buttons
+   * @param actions     the {@code GameState}s that the buttons return when clicked,
+   *                    must be same size list as btns
+   * @throws IllegalArgumentException if any of the parameters are null, contain null, or
+   *                                  if the actions and btns lists are not the same size
+   */
+  public Screen(String hText, ArrayList<String> bText, ArrayList<String> btns,
+                ArrayList<GameState> actions) throws IllegalArgumentException {
+    if (hText == null
+        || bText == null || bText.contains(null)
+        || btns == null || btns.contains(null)
+        || actions == null || actions.contains(null) || actions.size() != btns.size()) {
+      throw new IllegalArgumentException("Invalid list.");
+    }
+    initHeader(hText);
+    initBody(bText);
+    initButtons(btns, actions);
+    cursor = loadShape("snake.svg");
+  }
+  
+  /**
+   * Helper to the constructor. Initializes the header with the given header text.
+   *
+   * @param hText       the text for the header
+   */
+  private void initHeader(String hText) {
+    this.header = new ScreenText(width/2, height/2, hText, white, 80);
+  }
+  
+  /**
+   * Helper to the constructor. Initializes the body texts with the given list of body text.
+   *
+   * @param bText       the text for each of the body texts
+   */
+  private void initBody(ArrayList<String> bText) {
+    this.body = new ArrayList<ScreenText>();
+    int top = PApplet.parseInt(height/2) + PApplet.parseInt(this.header.getHeight()/2) + SECTION_PADDING;
+    int x = width/2;
+    for (String t : bText) {
+      ScreenText next = new ScreenText(0, 0, t, blue, 30);
+      next = new ScreenText(x, top + (next.getHeight() / 2) + ScreenText.PADDING, t, blue, 30);
+      top += next.getHeight();
+      this.body.add(next);
+    }
+  }
+  
+  /**
+   * Helper to the constructor. Initializes the buttons texts with the given
+   * list of button text and actions.
+   *
+   * @param btns        the text for each of the buttons
+   * @param actions     the {@code GameState}s that the buttons return when clicked
+   */
+  private void initButtons(ArrayList<String> btns, ArrayList<GameState> actions) {
+    this.buttons = new ArrayList<ScreenButton>();
+    int x = width/2;
+    int top = PApplet.parseInt(height/2) + PApplet.parseInt(this.header.getHeight()/2) + SECTION_PADDING;
+    for (ScreenText t : this.body) {
+      top += t.getHeight();
+    }
+    top += SECTION_PADDING;
+    for (String s : btns) {
+      boolean inFocus = (btns.indexOf(s) == 0);
+      ScreenButton next = new ScreenButton(x, top + ScreenText.PADDING, s, gray, 30,
+          inFocus, green, actions.get(btns.indexOf(s)));
+      top += next.getHeight();
+      this.buttons.add(next);
+    }
+  }
+  
+  /**
+   * Draws all elements on this screen.
+   */
+  public void display() {
+    header.display();
+    for (ScreenText t : this.body) {
+      t.display();
+    }
+    for (ScreenButton b : this.buttons) {
+      b.display();
+    }
+    shape(cursor, mouseX, mouseY);
+  }
+  
+  /**
+   * Updates focus of the buttons on this screen, based on keyboard input.
+   *
+   * @param up      true if the up arrow was pressed, false if down
+   */
+  public void update(boolean up) {
+    int which = -1;
+    for (int i = 0; i < buttons.size(); i++) {
+      if (buttons.get(i).getFocus()) {
+        which = i;
+      }
+      buttons.get(i).setFocus(false);
+    }
+    if (which >= 0) {
+      which += ((up) ? -1 : 1);
+      if (which > buttons.size() - 1) {
+        buttons.get(0).setFocus(true);
+      } else if (which < 0) {
+        buttons.get(buttons.size() - 1).setFocus(true);
+      } else {
+        buttons.get(which).setFocus(true);
+      }
+    } else {
+      buttons.get(0).setFocus(true);
+    }
+  }
+  
+  /**
+   * Updates focus of the buttons on this screen, based on mouse position.
+   *
+   * @param mX      the current x-position of the mouse
+   * @param mY      the current y-position of the mouse
+   */
+  public void update(int mX, int mY) {
+    int newFocus = -1;
+    int oldFocus = -1;
+    for (int i = 0; i < buttons.size(); i++) {
+      if (buttons.get(i).getFocus()) {
+        oldFocus = i;
+      }
+      buttons.get(i).setFocus(false);
+      if (buttons.get(i).hover(mX, mY)) {
+        newFocus = i;
+      }
+    }
+    if (newFocus >= 0) {
+      buttons.get(newFocus).setFocus(true);
+    } else {
+      buttons.get(oldFocus).setFocus(true);
+    }
+  }
+  
+  /**
+   * Returns the action of the focused button (or pressed button, if using mouse).
+   *
+   * @return which GameState the button takes the user to
+   */
+  public GameState useButton() {
+    for (ScreenButton b : this.buttons) {
+      if (b.getFocus() && (!mousePressed || (mousePressed && b.hover(mouseX, mouseY)))) {
+        resetFocus();
+        return b.getAction();
+      }
+    }
+    return null;
+  }
+  
+  /**
+   * Resets the focus of all buttons on the screen, so only the first is focused.
+   */
+  private void resetFocus() {
+    for (ScreenButton b : buttons) {
+      boolean inFocus = (buttons.indexOf(b) == 0);
+      b.setFocus(inFocus);
+    }
+  }
+  
+  /**
+   * Resets the body texts with the new given list of body text.
+   *
+   * @param bText       the text for each of the body texts
+   * @throws IllegalArgumentException if the given list is or contains null
+   */
+  public void setBody(ArrayList<String> bText) {
+    if (bText == null || bText.contains(null)) {
+      throw new IllegalArgumentException("Invalid list.");
+    }
+    this.initBody(bText);
+  }
+}
+/**
+ * Represents a button on a screen.
+ */
+public class ScreenButton extends ScreenText {
+  private boolean focus;
+  private final int focusFill;
+  private final GameState action;
+  
+  /**
+   * Constructs a {@code ScreenButton} object.
+   *
+   * @param x           the x-position of the button
+   * @param y           the y-position of the button
+   * @param value       the text value of the button
+   * @param fill        the fill color of the button
+   * @param fontSize    the font size of the button
+   * @param focus       true if the button is in focus, false otherwise
+   * @param focusFill   the fill color of the button when in focus
+   * @param action      the {@code GameState} that the button takes the user to on click/enter
+   * @throws IllegalArgumentException if either the value or action parameters are null
+   */
+  public ScreenButton(int x, int y, String value, int fill, int fontSize, boolean focus, int focusFill, GameState action) throws IllegalArgumentException {
+    super(x, y, value, fill, fontSize);
+    if (action == null) {
+      throw new IllegalArgumentException("Cannot accept null action.");
+    }
+    this.focus = focus;
+    this.focusFill = focusFill;
+    this.action = action;
+  }
+  
+  @Override
+  public void display() {
+    textAlign(CENTER);
+    textSize(this.fontSize);
+    if (focus) {
+      fill(this.focusFill);
+    } else {
+      fill(this.fill);
+    }
+    text(this.value, this.x, this.y);
+  }
+  
+  /**
+   * Returns the current state of the button's focus.
+   *
+   * @return true if this button is in focus, false otherwise
+   */
+  public boolean getFocus() {
+    return this.focus;
+  }
+  
+  /**
+   * Sets the current state of the button's focus.
+   *
+   * @param inFocus      true to set button to in focus, false otherwise
+   */
+  public void setFocus(boolean inFocus) {
+    if (inFocus) {
+      this.focus = true;
+    } else {
+      this.focus = false;
+    }
+  }
+  
+  /**
+   * Checks if the mouse is hovering this button.
+   *
+   * @return true if the mouse is hovering above, false otherwise
+   */
+  public boolean hover(int mX, int mY) {
+    int h = this.getHeight() / 2;
+    int w = this.getWidth() / 2;
+    return mY > this.y - h && mY < this.y + h
+        && mX > this.x - w && mX < this.x + w;
+  }
+  
+  /**
+   * Returns the action of this button.
+   *
+   * @return this button's action
+   */
+  public GameState getAction() {
+    return this.action;
+  }
+}
+/**
+ * Represents text on a screen.
+ */
+public class ScreenText {
+  protected final int x;
+  protected final int y;
+  protected final String value;
+  protected final int fill;
+  protected final int fontSize;
+  public static final int PADDING = 15;
+  public static final int LEADING = 15;
+  
+  /**
+   * Constructs a {@code ScreenButton} object.
+   *
+   * @param x           the x-position of the button
+   * @param y           the y-position of the button
+   * @param value       the text value of the button
+   * @param fill        the fill color of the button
+   * @param fontSize    the font size of the button
+   * @throws IllegalArgumentException if the given value is null
+   */
+  public ScreenText(int x, int y, String value, int fill, int fontSize) throws IllegalArgumentException {
+    if (value == null) {
+      throw new IllegalArgumentException("Cannot pass null text value.");
+    }
+    this.x = x;
+    this.y = y;
+    this.value = value;
+    this.fill = fill;
+    this.fontSize = fontSize;
+  }
+  
+  /**
+   * Calculates the height of the text, with padding.
+   *
+   * @returns the height of this text
+   */
+  public int getHeight() {
+    int lines = 1;
+    for (int i = 0; i < this.value.length(); i++) {
+      lines += (this.value.charAt(i) == '\n') ? 1 : 0;
+    }
+    return (this.fontSize * lines) + ((lines > 0) ? (LEADING * (lines - 1)) : 0) + (2 * PADDING);
+  }
+  
+  /**
+   * Calculates the width of the text, with padding.
+   *
+   * @returns the width of this text
+   */
+  public int getWidth() {
+    textSize(this.fontSize);
+    return PApplet.parseInt(textWidth(this.value)) + (2 * PADDING);
+  }
+  
+  /**
+   * Draws the text onto the sketch.
+   */
+  public void display() {
+    textAlign(CENTER, BOTTOM);
+    textSize(this.fontSize);
+    textLeading(this.fontSize + LEADING);
+    fill(this.fill);
+    text(this.value, this.x, this.y);
+  }
+}
+/**
  * Represents a slime space on the grid.
  */
-public class SlimeSpace extends ASpace {
+public final class SlimeSpace extends ASpace {
   /**
    * Constructs a {@code SlimeSpace}.
    *
@@ -446,7 +805,7 @@ public class SlimeSpace extends ASpace {
 /**
  * Represents the slimer food on the grid.
  */
-public class SlimerFoodSpace extends AFoodSpace {
+public final class SlimerFoodSpace extends AFoodSpace {
   /**
    * Constructs a {@code SlimerFoodSpace}.
    *
@@ -483,7 +842,7 @@ public class SlimerFoodSpace extends AFoodSpace {
 /**
  * Represents the slow food on the grid.
  */
-public class SlowFoodSpace extends AFoodSpace {
+public final class SlowFoodSpace extends AFoodSpace {
   /**
    * Constructs a {@code SlowFoodSpace}.
    *
@@ -515,7 +874,7 @@ public class SlowFoodSpace extends AFoodSpace {
     if (snake == null || snake.size() == 0 || foods == null) {
       throw new IllegalArgumentException("Invalid lists passed.");
     }
-    frameRate(SnakeModel.defaultFrameRate / 3);
+    frameRate(SnakeView.defaultFrameRate / 3);
     return FoodType.SLOW;
   }
 }
@@ -523,11 +882,10 @@ public class SlowFoodSpace extends AFoodSpace {
  * Represents the model, or logic, of the game.
  */
 public class SnakeModel {
-  public static final int defaultFrameRate = 20;
   private final int[] mappedKeys = {UP, DOWN, LEFT, RIGHT};
   private final int[] revMappedKeys = {DOWN, UP, RIGHT, LEFT};
   private final int foodSpawnWait = 750;
-  private final int foodDespawnWait = 4000;
+  private final int foodDespawnWait = 7000;
   private final int foodEffectWait = 6000;
   
   private ArrayList<SnakeSpace> snake;
@@ -548,7 +906,6 @@ public class SnakeModel {
    * Constructs a model of the game snake and starts the program.
    */
   public SnakeModel() {
-    frameRate(defaultFrameRate);
     highScore = 1;
     gameState = GameState.START;
   }
@@ -557,6 +914,7 @@ public class SnakeModel {
    * Initializes/Resets the world back to its original state.
    */
   private void init() {
+    frameRate(SnakeView.defaultFrameRate);
     reverseMapping = false;
     spawnTimer = 0;
     despawnTimer = 0;
@@ -576,26 +934,14 @@ public class SnakeModel {
   }
   
   /**
-   * Draws an update of the model, based on the current game state.
+   * Draws and updates the model, based on the current game state.
    */
   public void update() {
     view.display(gameState, snake, foods, slime, ate, highScore);
-    switch (gameState) {
-      case START:
-        //updateStart();
-        break;
-      case INSTRUCTIONS:
-        //updateInstructions();
-        break;
-      case PLAYING:
-        isGameOver();
-        updatePlaying();
-        break;
-      case GAME_OVER:
-        //updateGameOver();
-        break;
-      default:
-        throw new IllegalStateException("State of game does not exist.");
+    view.updateScreen(gameState, mouseX, mouseY);
+    if (gameState.equals(GameState.PLAYING)) {
+      isGameOver();
+      updatePlaying();
     }
   }
   
@@ -662,7 +1008,7 @@ public class SnakeModel {
       ate = FoodType.DEFAULT;
       effectTimer = 0;
       reverseMapping = false;
-      frameRate(defaultFrameRate);
+      frameRate(SnakeView.defaultFrameRate);
       slime = new ArrayList<SlimeSpace>();
     }
   }
@@ -733,8 +1079,27 @@ public class SnakeModel {
   public void keyHandler() {
     if (gameState.equals(GameState.PLAYING)) {
       keyHandlerPlaying();
-    } else if (gameState.equals(GameState.GAME_OVER)) {
-      keyHandlerGameOver();
+    } else {
+      keyHandlerScreen(); 
+    }
+  }
+  
+  /**
+   * Helper to the keyHandler() function. Handles keys for the
+   * START, INSTRUCTIONS, and GAME_OVER game states.
+   */
+  private void keyHandlerScreen() {
+    if (key == CODED) {
+      if (keyCode == UP || keyCode == DOWN) {
+        view.updateScreen(gameState, keyCode == UP);
+      }
+    } else {
+      if (key == '\n' || key == '\r') {
+        gameState = view.useButton(gameState);
+        if (gameState == GameState.PLAYING) {
+          init();
+        }
+      }
     }
   }
   
@@ -782,17 +1147,14 @@ public class SnakeModel {
   }
   
   /**
-   * Helper to the keyHandler() function. Handles keys for the GAME_OVER game state.
+   * Handles mouse presses based on the current game state.
    */
-  private void keyHandlerGameOver() {
-    if (key == '\n' || key == '\r') {
-      init();
-    }
-  }
-  
   public void mouseHandler() {
-    if (gameState.equals(GameState.START)) {
-      init();
+    if (!gameState.equals(GameState.PLAYING) && mousePressed) {
+      gameState = view.useButton(gameState);
+      if (gameState == GameState.PLAYING) {
+        init();
+      }
     }
   }
   
@@ -823,7 +1185,7 @@ public class SnakeModel {
 /**
  * Represents a snake's space on the grid.
  */
-public class SnakeSpace extends ASpace {
+public final class SnakeSpace extends ASpace {
   private boolean head;
   private Direction direction;
   
@@ -992,17 +1354,32 @@ public class SnakeSpace extends ASpace {
     return this.x < 0 || this.x > hiX || this.y < 0 || this.y > hiY;
   }
 }
+
+
 /**
  * Represents the view of the game.
  */
 public class SnakeView {
+  public static final int defaultFrameRate = 15;
   private final int white = color(255);
   private final int ground = color(0xff2d0e05);
   private final int blue = color(0xff3a7cef);
-  private final int red = color(0xffff3b4a);
-  private final int green = color(0xff0edd48);
-  private final int gray = color(0xffafafaf);
   private final PFont pixeled = createFont("Pixeled.ttf", 20);
+  
+  private Screen start = new Screen("snake",
+      new ArrayList<String>(),
+      new ArrayList<String>(Arrays.asList("play", "instructions")),
+      new ArrayList<GameState>(Arrays.asList(GameState.PLAYING, GameState.INSTRUCTIONS)));
+      
+  private Screen instruct = new Screen("instructions",
+      new ArrayList<String>(Arrays.asList("use arrow keys to\nmove the snake\nand eat food", "don't hit the\nwalls or yourself")),
+      new ArrayList<String>(Arrays.asList("back")),
+      new ArrayList<GameState>(Arrays.asList(GameState.START)));
+      
+  private Screen gameOver = new Screen("game\nover",
+      new ArrayList<String>(Arrays.asList("high score: 0", "score: 0")),
+      new ArrayList<String>(Arrays.asList("continue", "exit")),
+      new ArrayList<GameState>(Arrays.asList(GameState.PLAYING, GameState.START)));
   
   /**
    * Constructs a {@code SnakeView} object.
@@ -1026,15 +1403,18 @@ public class SnakeView {
     background(ground);
     switch (gs) {
       case START:
+        frameRate(30);
         displayStart();
         break;
       case INSTRUCTIONS:
-        //displayInstructions();
+        frameRate(30);
+        displayInstructions();
         break;
       case PLAYING:
         displayPlaying(snake, foods, slime, ate, highScore);
         break;
       case GAME_OVER:
+        frameRate(30);
         displayGameOver(snake, highScore);
         break;
       default:
@@ -1046,13 +1426,11 @@ public class SnakeView {
    * Displays the start screen of the game.
    */
   public void displayStart() {
-    fill(white);
-    textAlign(CENTER);
-    textSize(100);
-    text("snake", width/2, height/2);
-    fill(green);
-    textSize(20);
-    text("click to start", width/2, height/2 + 40);
+    start.display();
+  }
+  
+  public void displayInstructions() {
+    instruct.display();
   }
   
   /**
@@ -1094,32 +1472,77 @@ public class SnakeView {
    * @param highScore    the current high score
    */
   public void displayGameOver(ArrayList<SnakeSpace> snake, int highScore) {
-    fill(white);
-    textAlign(CENTER);
-    textSize(100);
-    text("game over", width/2, height/2);
-    int padding = 0;
-    textSize(20);
-    padding = 60;
+    String highscoreText;
     if (snake.size() > highScore) {
-      fill(blue);
-      text("NEW HIGH SCORE: " + snake.size(), width/2, height/2 + padding);
+      highscoreText = "NEW HIGH SCORE: " + snake.size();
     } else {
-      fill(gray);
-      text("high score: " + highScore, width/2, height/2 + padding);
+      highscoreText = "high score: " + highScore;
     }
-    fill(gray);
-    padding += 40;
-    text("score: " + snake.size(), width/2, height/2 + padding);
-    padding += 40;
-    fill(green);
-    text("continue", width/2, height/2 + padding);
+    
+    gameOver.setBody(new ArrayList<String>(Arrays.asList(highscoreText, "score: " + snake.size())));
+    gameOver.display();
+  }
+  
+  /**
+   * Updates any buttons on the screen, based on keyboard input.
+   *
+   * @param gs     the current state of the game
+   * @param up     true if the up arrow was pressed, false if down
+   */
+  public void updateScreen(GameState gs, boolean up) {
+    if (gs.equals(GameState.START)) {
+      start.update(up);
+    } else if (gs.equals(GameState.GAME_OVER)) {
+      gameOver.update(up);
+    } else if (gs.equals(GameState.INSTRUCTIONS)) {
+      instruct.update(up);
+    }
+  }
+  
+  /**
+   * Updates any buttons on the screen, based on mouse position.
+   *
+   * @param gs     the current state of the game
+   * @param mX     the x-position of the mouse
+   * @param mY     the y-position of the mouse
+   */
+  public void updateScreen(GameState gs, int mX, int mY) {
+    if (gs.equals(GameState.START)) {
+      start.update(mX, mY);
+    } else if (gs.equals(GameState.GAME_OVER)) {
+      gameOver.update(mX, mY);
+    } else if (gs.equals(GameState.INSTRUCTIONS)) {
+      instruct.update(mX, mY);
+    }
+  }
+  
+  /**
+   * Returns the action of the focused button (or pressed button, if using mouse)
+   * currently on the screen. If no action is provided, returns the current
+   * game state.
+   *
+   * @param gs     the current state of the game
+   * @return the next GameState to switch to, or the given one if none is found
+   */
+  public GameState useButton(GameState gs) {
+    GameState action = null;
+    if (gs.equals(GameState.START)) {
+      action = start.useButton();
+    } else if (gs.equals(GameState.GAME_OVER)) {
+      action = gameOver.useButton();
+    } else if (gs.equals(GameState.INSTRUCTIONS)) {
+      action = instruct.useButton();
+    }
+    if (action != null) {
+      return action;
+    }
+    return gs;
   }
 }
 /**
  * Represents the star food on the grid.
  */
-public class StarFoodSpace extends AFoodSpace {
+public final class StarFoodSpace extends AFoodSpace {
   private final int[] rainbow = {color(0xffff3e3e), color(0xffffa83e), color(0xfff8ff3e), color(0xff3eff6c), color(0xff3e89ff), color(0xffb13eff)};
   
   /**
@@ -1160,7 +1583,7 @@ public class StarFoodSpace extends AFoodSpace {
 /**
  * Represents a turning space on the grid.
  */
-public class TurnSpace extends ASpace {
+public final class TurnSpace extends ASpace {
   protected Direction direction;
   /**
    * Constructs a {@code TurnSpace}.

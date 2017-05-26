@@ -5,7 +5,7 @@ public class SnakeModel {
   private final int[] mappedKeys = {UP, DOWN, LEFT, RIGHT};
   private final int[] revMappedKeys = {DOWN, UP, RIGHT, LEFT};
   private final int foodSpawnWait = 750;
-  private final int foodDespawnWait = 4000;
+  private final int foodDespawnWait = 7000;
   private final int foodEffectWait = 6000;
   
   private ArrayList<SnakeSpace> snake;
@@ -34,6 +34,7 @@ public class SnakeModel {
    * Initializes/Resets the world back to its original state.
    */
   private void init() {
+    frameRate(SnakeView.defaultFrameRate);
     reverseMapping = false;
     spawnTimer = 0;
     despawnTimer = 0;
