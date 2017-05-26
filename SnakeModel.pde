@@ -2,7 +2,6 @@
  * Represents the model, or logic, of the game.
  */
 public class SnakeModel {
-  public static final int defaultFrameRate = 20;
   private final int[] mappedKeys = {UP, DOWN, LEFT, RIGHT};
   private final int[] revMappedKeys = {DOWN, UP, RIGHT, LEFT};
   private final int foodSpawnWait = 750;
@@ -27,7 +26,6 @@ public class SnakeModel {
    * Constructs a model of the game snake and starts the program.
    */
   public SnakeModel() {
-    frameRate(defaultFrameRate);
     highScore = 1;
     gameState = GameState.START;
   }
@@ -59,22 +57,10 @@ public class SnakeModel {
    */
   public void update() {
     view.display(gameState, snake, foods, slime, ate, highScore);
-    switch (gameState) {
-      case START:
-        //updateStart();
-        break;
-      case INSTRUCTIONS:
-        //updateInstructions();
-        break;
-      case PLAYING:
-        isGameOver();
-        updatePlaying();
-        break;
-      case GAME_OVER:
-        //updateGameOver();
-        break;
-      default:
-        throw new IllegalStateException("State of game does not exist.");
+    view.updateScreen(gameState, mouseX, mouseY);
+    if (gameState.equals(GameState.PLAYING)) {
+      isGameOver();
+      updatePlaying();
     }
   }
   
@@ -141,7 +127,7 @@ public class SnakeModel {
       ate = FoodType.DEFAULT;
       effectTimer = 0;
       reverseMapping = false;
-      frameRate(defaultFrameRate);
+      frameRate(SnakeView.defaultFrameRate);
       slime = new ArrayList<SlimeSpace>();
     }
   }
@@ -212,8 +198,27 @@ public class SnakeModel {
   public void keyHandler() {
     if (gameState.equals(GameState.PLAYING)) {
       keyHandlerPlaying();
-    } else if (gameState.equals(GameState.GAME_OVER)) {
-      keyHandlerGameOver();
+    } else {
+      keyHandlerScreen(); 
+    }
+  }
+  
+  /**
+   * Helper to the keyHandler() function. Handles keys for the
+   * START, INSTRUCTIONS, and GAME_OVER game states.
+   */
+  private void keyHandlerScreen() {
+    if (key == CODED) {
+      if (keyCode == UP || keyCode == DOWN) {
+        view.updateScreen(gameState, keyCode == UP);
+      }
+    } else {
+      if (key == '\n' || key == '\r') {
+        gameState = view.useButton(gameState);
+        if (gameState == GameState.PLAYING) {
+          init();
+        }
+      }
     }
   }
   
@@ -261,17 +266,14 @@ public class SnakeModel {
   }
   
   /**
-   * Helper to the keyHandler() function. Handles keys for the GAME_OVER game state.
+   * Handles mouse presses based on the current game state.
    */
-  private void keyHandlerGameOver() {
-    if (key == '\n' || key == '\r') {
-      init();
-    }
-  }
-  
   public void mouseHandler() {
-    if (gameState.equals(GameState.START)) {
-      init();
+    if (!gameState.equals(GameState.PLAYING) && mousePressed) {
+      gameState = view.useButton(gameState);
+      if (gameState == GameState.PLAYING) {
+        init();
+      }
     }
   }
   

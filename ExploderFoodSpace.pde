@@ -1,7 +1,7 @@
 /**
  * Represents the exploder food on the grid.
  */
-public class ExploderFoodSpace extends AFoodSpace {
+public final class ExploderFoodSpace extends AFoodSpace {
   /**
    * Constructs a {@code ExploderFoodSpace}.
    *

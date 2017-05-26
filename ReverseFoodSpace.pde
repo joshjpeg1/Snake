@@ -1,7 +1,7 @@
 /**
  * Represents the reverse food on the grid.
  */
-public class ReverseFoodSpace extends AFoodSpace {
+public final class ReverseFoodSpace extends AFoodSpace {
   /**
    * Constructs a {@code ReverseFoodSpace}.
    *

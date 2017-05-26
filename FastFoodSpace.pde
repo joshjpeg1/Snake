@@ -1,7 +1,7 @@
 /**
  * Represents the fast food on the grid.
  */
-public class FastFoodSpace extends AFoodSpace {
+public final class FastFoodSpace extends AFoodSpace {
   /**
    * Constructs a {@code FastFoodSpace}.
    *
@@ -32,7 +32,7 @@ public class FastFoodSpace extends AFoodSpace {
     if (snake == null || snake.size() == 0 || foods == null) {
       throw new IllegalArgumentException("Invalid lists passed.");
     }
-    frameRate(SnakeModel.defaultFrameRate * 3);
+    frameRate(SnakeView.defaultFrameRate * 3);
     return FoodType.FAST;
   }
 }

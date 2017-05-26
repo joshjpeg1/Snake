@@ -1,7 +1,7 @@
 /**
  * Represents the slimer food on the grid.
  */
-public class SlimerFoodSpace extends AFoodSpace {
+public final class SlimerFoodSpace extends AFoodSpace {
   /**
    * Constructs a {@code SlimerFoodSpace}.
    *

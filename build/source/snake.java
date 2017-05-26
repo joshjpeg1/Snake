@@ -73,7 +73,7 @@ public abstract class AFoodSpace extends ASpace {
     super(0, 0);
     randomSpace(snake.BOARD_SIZE, snake.BOARD_SIZE);
   }
-  
+
   /**
    * Assigns this {@code AFoodSpace} a random position on the grid.
    *
@@ -84,12 +84,12 @@ public abstract class AFoodSpace extends ASpace {
     this.x = PApplet.parseInt(random(hiX));
     this.y = PApplet.parseInt(random(hiY));
   }
-  
+
   @Override
   public int getColor() {
     return color(234);
   }
-  
+
   /**
    * Mutates the list based on the effect of this {@code AFoodSpace}.
    *

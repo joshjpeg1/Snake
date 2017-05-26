@@ -1,7 +1,7 @@
 /**
  * Represents a slime space on the grid.
  */
-public class SlimeSpace extends ASpace {
+public final class SlimeSpace extends ASpace {
   /**
    * Constructs a {@code SlimeSpace}.
    *

@@ -1,7 +1,7 @@
 /**
  * Represents the default food on the grid.
  */
-public class DefaultFoodSpace extends AFoodSpace {
+public final class DefaultFoodSpace extends AFoodSpace {
   /**
    * Constructs a {@code DefaultFoodSpace}.
    *

@@ -1,7 +1,7 @@
 /**
  * Represents the decapitator food on the grid.
  */
-public class DecapitatorFoodSpace extends AFoodSpace {
+public final class DecapitatorFoodSpace extends AFoodSpace {
   /**
    * Constructs a {@code DecapitatorFoodSpace}.
    *

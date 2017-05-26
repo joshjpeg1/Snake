@@ -1,7 +1,7 @@
 /**
  * Represents the slow food on the grid.
  */
-public class SlowFoodSpace extends AFoodSpace {
+public final class SlowFoodSpace extends AFoodSpace {
   /**
    * Constructs a {@code SlowFoodSpace}.
    *
@@ -33,7 +33,7 @@ public class SlowFoodSpace extends AFoodSpace {
     if (snake == null || snake.size() == 0 || foods == null) {
       throw new IllegalArgumentException("Invalid lists passed.");
     }
-    frameRate(SnakeModel.defaultFrameRate / 3);
+    frameRate(SnakeView.defaultFrameRate / 3);
     return FoodType.SLOW;
   }
 }

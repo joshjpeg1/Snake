@@ -1,9 +1,8 @@
+import java.util.Random;
+ 
 /**
  * Represents the different types of food.
  */
- 
-import java.util.Random;
- 
 public static enum FoodType {
   DEFAULT(1), DECAPITATOR(2), FAST(3),
   SLOW(3), EXPLODER(5), SLIMER(5),

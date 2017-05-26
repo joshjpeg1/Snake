@@ -1,19 +1,43 @@
+import java.util.Arrays;
+
 /**
  * Represents the view of the game.
  */
 public class SnakeView {
+  public static final int defaultFrameRate = 15;
   private final color white = color(255);
   private final color ground = color(#2d0e05);
   private final color blue = color(#3a7cef);
-  private final color red = color(#ff3b4a);
-  private final color green = color(#0edd48);
-  private final color gray = color(#afafaf);
   private final PFont pixeled = createFont("Pixeled.ttf", 20);
+  private PShape cursor;
+  
+  private Screen start = new Screen("snake",
+      new ArrayList<String>(),
+      new ArrayList<String>(Arrays.asList("play", "instructions")),
+      new ArrayList<GameState>(Arrays.asList(GameState.PLAYING, GameState.INSTRUCTIONS)));
+      
+  private Screen instruct = new Screen("instructions",
+      new ArrayList<String>(Arrays.asList("use arrow keys to\nmove the snake\nand eat food", "don't hit the\nwalls or yourself")),
+      new ArrayList<String>(Arrays.asList("back")),
+      new ArrayList<GameState>(Arrays.asList(GameState.START)));
+      
+  private Screen gameOver = new Screen("game\nover",
+      new ArrayList<String>(Arrays.asList("high score: 0", "score: 0")),
+      new ArrayList<String>(Arrays.asList("continue", "exit")),
+      new ArrayList<GameState>(Arrays.asList(GameState.PLAYING, GameState.START)));
+  
+  //private ArrayList<Button> startBtns = new ArrayList<Button>();
+  //private ArrayList<Button> instructBtns = new ArrayList<Button>();
+  //private ArrayList<Button> gameOverBtns = new ArrayList<Button>();
+    /*int x, int y, String value, boolean focus, color defaultColor,
+                color focusColor*/
   
   /**
    * Constructs a {@code SnakeView} object.
    */
   public SnakeView() {
+    frameRate(30);
+    cursor = loadShape("snake.svg");
     textFont(pixeled);
   }
   
@@ -32,15 +56,19 @@ public class SnakeView {
     background(ground);
     switch (gs) {
       case START:
+        frameRate(30);
         displayStart();
         break;
       case INSTRUCTIONS:
-        //displayInstructions();
+        frameRate(30);
+        displayInstructions();
         break;
       case PLAYING:
+        frameRate(defaultFrameRate);
         displayPlaying(snake, foods, slime, ate, highScore);
         break;
       case GAME_OVER:
+        frameRate(30);
         displayGameOver(snake, highScore);
         break;
       default:
@@ -48,17 +76,52 @@ public class SnakeView {
     }
   }
   
+  public void updateScreen(GameState gs, boolean up) {
+    if (gs.equals(GameState.START)) {
+      start.update(up);
+    } else if (gs.equals(GameState.GAME_OVER)) {
+      gameOver.update(up);
+    } else if (gs.equals(GameState.INSTRUCTIONS)) {
+      instruct.update(up);
+    }
+  }
+  
+  public void updateScreen(GameState gs, int mX, int mY) {
+    if (gs.equals(GameState.START)) {
+      start.update(mX, mY);
+    } else if (gs.equals(GameState.GAME_OVER)) {
+      gameOver.update(mX, mY);
+    } else if (gs.equals(GameState.INSTRUCTIONS)) {
+      instruct.update(mX, mY);
+    }
+  }
+  
+  public GameState useButton(GameState gs) {
+    GameState action = null;
+    if (gs.equals(GameState.START)) {
+      action = start.useButton();
+    } else if (gs.equals(GameState.GAME_OVER)) {
+      action = gameOver.useButton();
+    } else if (gs.equals(GameState.INSTRUCTIONS)) {
+      action = instruct.useButton();
+    }
+    if (action != null) {
+      return action;
+    }
+    return gs;
+  }
+  
   /**
    * Displays the start screen of the game.
    */
   public void displayStart() {
-    fill(white);
-    textAlign(CENTER);
-    textSize(100);
-    text("snake", width/2, height/2);
-    fill(green);
-    textSize(20);
-    text("click to start", width/2, height/2 + 40);
+    start.display();
+    shape(cursor, mouseX, mouseY);
+  }
+  
+  public void displayInstructions() {
+    instruct.display();
+    shape(cursor, mouseX, mouseY);
   }
   
   /**
@@ -100,25 +163,15 @@ public class SnakeView {
    * @param highScore    the current high score
    */
   public void displayGameOver(ArrayList<SnakeSpace> snake, int highScore) {
-    fill(white);
-    textAlign(CENTER);
-    textSize(100);
-    text("game over", width/2, height/2);
-    int padding = 0;
-    textSize(20);
-    padding = 60;
+    String highscoreText;
     if (snake.size() > highScore) {
-      fill(blue);
-      text("NEW HIGH SCORE: " + snake.size(), width/2, height/2 + padding);
+      highscoreText = "NEW HIGH SCORE: " + snake.size();
     } else {
-      fill(gray);
-      text("high score: " + highScore, width/2, height/2 + padding);
+      highscoreText = "high score: " + highScore;
     }
-    fill(gray);
-    padding += 40;
-    text("score: " + snake.size(), width/2, height/2 + padding);
-    padding += 40;
-    fill(green);
-    text("continue", width/2, height/2 + padding);
+    
+    gameOver.setBody(new ArrayList<String>(Arrays.asList(highscoreText, "score: " + snake.size())));
+    gameOver.display();
+    shape(cursor, mouseX, mouseY);
   }
 }

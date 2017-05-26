@@ -1,7 +1,7 @@
 /**
  * Represents the star food on the grid.
  */
-public class StarFoodSpace extends AFoodSpace {
+public final class StarFoodSpace extends AFoodSpace {
   private final color[] rainbow = {color(#ff3e3e), color(#ffa83e), color(#f8ff3e), color(#3eff6c), color(#3e89ff), color(#b13eff)};
   
   /**

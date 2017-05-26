@@ -1,7 +1,7 @@
 /**
  * Represents a snake's space on the grid.
  */
-public class SnakeSpace extends ASpace {
+public final class SnakeSpace extends ASpace {
   private boolean head;
   private Direction direction;
   

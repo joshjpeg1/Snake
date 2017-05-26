@@ -1,7 +1,7 @@
 /**
  * Represents a turning space on the grid.
  */
-public class TurnSpace extends ASpace {
+public final class TurnSpace extends ASpace {
   protected Direction direction;
   /**
    * Constructs a {@code TurnSpace}.
