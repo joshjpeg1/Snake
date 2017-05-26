@@ -1,13 +1,14 @@
 /**
  * Represents a turning space on the grid.
  */
-public class TurnSpace extends ASpace {
+public final class TurnSpace extends ASpace {
   protected Direction direction;
   /**
-   * Constructs an {@code TurnSpace}.
-   * @param x            the x-position
-   * @param y            the y-position
-   * @param direction    the direction of the turn
+   * Constructs a {@code TurnSpace}.
+   *
+   * @param x       the x-position
+   * @param y       the y-position
+   * @param dir     the direction of the turn
    */
   public TurnSpace(int x, int y, Direction dir) {
     super(x, y);
@@ -15,6 +16,5 @@ public class TurnSpace extends ASpace {
       throw new IllegalArgumentException("Invalid direction.");
     }
     this.direction = dir;
-    this.fillColor = color(0, 0);
   }
 }
