@@ -53,7 +53,7 @@ public class SnakeModel {
   }
   
   /**
-   * Draws an update of the model, based on the current game state.
+   * Draws and updates the model, based on the current game state.
    */
   public void update() {
     view.display(gameState, snake, foods, slime, ate, highScore);

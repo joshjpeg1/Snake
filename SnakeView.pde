@@ -9,7 +9,6 @@ public class SnakeView {
   private final color ground = color(#2d0e05);
   private final color blue = color(#3a7cef);
   private final PFont pixeled = createFont("Pixeled.ttf", 20);
-  private PShape cursor;
   
   private Screen start = new Screen("snake",
       new ArrayList<String>(),
@@ -26,18 +25,11 @@ public class SnakeView {
       new ArrayList<String>(Arrays.asList("continue", "exit")),
       new ArrayList<GameState>(Arrays.asList(GameState.PLAYING, GameState.START)));
   
-  //private ArrayList<Button> startBtns = new ArrayList<Button>();
-  //private ArrayList<Button> instructBtns = new ArrayList<Button>();
-  //private ArrayList<Button> gameOverBtns = new ArrayList<Button>();
-    /*int x, int y, String value, boolean focus, color defaultColor,
-                color focusColor*/
-  
   /**
    * Constructs a {@code SnakeView} object.
    */
   public SnakeView() {
     frameRate(30);
-    cursor = loadShape("snake.svg");
     textFont(pixeled);
   }
   
@@ -76,52 +68,15 @@ public class SnakeView {
     }
   }
   
-  public void updateScreen(GameState gs, boolean up) {
-    if (gs.equals(GameState.START)) {
-      start.update(up);
-    } else if (gs.equals(GameState.GAME_OVER)) {
-      gameOver.update(up);
-    } else if (gs.equals(GameState.INSTRUCTIONS)) {
-      instruct.update(up);
-    }
-  }
-  
-  public void updateScreen(GameState gs, int mX, int mY) {
-    if (gs.equals(GameState.START)) {
-      start.update(mX, mY);
-    } else if (gs.equals(GameState.GAME_OVER)) {
-      gameOver.update(mX, mY);
-    } else if (gs.equals(GameState.INSTRUCTIONS)) {
-      instruct.update(mX, mY);
-    }
-  }
-  
-  public GameState useButton(GameState gs) {
-    GameState action = null;
-    if (gs.equals(GameState.START)) {
-      action = start.useButton();
-    } else if (gs.equals(GameState.GAME_OVER)) {
-      action = gameOver.useButton();
-    } else if (gs.equals(GameState.INSTRUCTIONS)) {
-      action = instruct.useButton();
-    }
-    if (action != null) {
-      return action;
-    }
-    return gs;
-  }
-  
   /**
    * Displays the start screen of the game.
    */
   public void displayStart() {
     start.display();
-    shape(cursor, mouseX, mouseY);
   }
   
   public void displayInstructions() {
     instruct.display();
-    shape(cursor, mouseX, mouseY);
   }
   
   /**
@@ -172,6 +127,61 @@ public class SnakeView {
     
     gameOver.setBody(new ArrayList<String>(Arrays.asList(highscoreText, "score: " + snake.size())));
     gameOver.display();
-    shape(cursor, mouseX, mouseY);
+  }
+  
+  /**
+   * Updates any buttons on the screen, based on keyboard input.
+   *
+   * @param gs     the current state of the game
+   * @param up     true if the up arrow was pressed, false if down
+   */
+  public void updateScreen(GameState gs, boolean up) {
+    if (gs.equals(GameState.START)) {
+      start.update(up);
+    } else if (gs.equals(GameState.GAME_OVER)) {
+      gameOver.update(up);
+    } else if (gs.equals(GameState.INSTRUCTIONS)) {
+      instruct.update(up);
+    }
+  }
+  
+  /**
+   * Updates any buttons on the screen, based on mouse position.
+   *
+   * @param gs     the current state of the game
+   * @param mX     the x-position of the mouse
+   * @param mY     the y-position of the mouse
+   */
+  public void updateScreen(GameState gs, int mX, int mY) {
+    if (gs.equals(GameState.START)) {
+      start.update(mX, mY);
+    } else if (gs.equals(GameState.GAME_OVER)) {
+      gameOver.update(mX, mY);
+    } else if (gs.equals(GameState.INSTRUCTIONS)) {
+      instruct.update(mX, mY);
+    }
+  }
+  
+  /**
+   * Returns the action of the focused button (or pressed button, if using mouse)
+   * currently on the screen. If no action is provided, returns the current
+   * game state.
+   *
+   * @param gs     the current state of the game
+   * @return the next GameState to switch to, or the given one if none is found
+   */
+  public GameState useButton(GameState gs) {
+    GameState action = null;
+    if (gs.equals(GameState.START)) {
+      action = start.useButton();
+    } else if (gs.equals(GameState.GAME_OVER)) {
+      action = gameOver.useButton();
+    } else if (gs.equals(GameState.INSTRUCTIONS)) {
+      action = instruct.useButton();
+    }
+    if (action != null) {
+      return action;
+    }
+    return gs;
   }
 }
